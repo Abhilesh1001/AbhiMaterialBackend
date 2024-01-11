@@ -14,4 +14,5 @@ urlpatterns = [
     path('createDelivery/<int:pk>/', views.DeliveryAdressView.as_view()),
     path('createpo', views.PurchaseOrderView.as_view()),
     path('createpo/<int:pk>/', views.PurchaseOrderView.as_view()),
+    path('prview/<int:pk>/', views.OrPurchaseRequestNewView.as_view()),
 ]

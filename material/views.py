@@ -226,8 +226,9 @@ def itemPr(pr_no_require):
 
     # Calculate total quantities from PurchaseRequestNew
     for pureq in pr:
-        newVal = json.loads(pureq.item_json)
-        for item in newVal:
+        newValPr = json.loads(pureq.item_json)
+
+        for item in newValPr:
             pr_no = pureq.pr_no
             line_no = item["line_no"]
             material_qty = item["material_qty"]
@@ -238,12 +239,13 @@ def itemPr(pr_no_require):
 
     # Calculate remaining quantities by subtracting from PurchaseOrder
     for purchase in po:
-        newVal = json.loads(purchase.item_pr)
-        for item in newVal:
+        newValPo = json.loads(purchase.item_pr)
+        
+        for item in newValPo:
+            print(item)
             pr_no = item["pr_no"]
             line_no = item["line_no"]
             material_qty = item["material_qty"]
-            print(material_qty)
             if material_qty is not None:
               remaining_quantities[(pr_no, line_no)] -= int(material_qty)
 
@@ -343,7 +345,7 @@ class PurchaseRequestNewView(APIView):
         serializer = PurchaseRequestSerializer(pr, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({'msg': 'Data changed successfully'}, status=status.HTTP_200_OK)
+            return Response({'msg': 'Data changed successfully','data':serializer.data}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, pk=None, format=None):
@@ -351,7 +353,7 @@ class PurchaseRequestNewView(APIView):
         serializer = PurchaseRequestSerializer(pr, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response({'msg': 'Data changed successfully'}, status=status.HTTP_200_OK)
+            return Response({'msg': 'Data changed successfully','data':serializer.data}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -467,7 +469,24 @@ class PurchaseOrderView(APIView):
         serilizer = PurchaseOrderSerilizer(po,data=request.data)
         if serilizer.is_valid():
             serilizer.save()
-            return Response({'msg':'data change successfully'},status=status.HTTP_201_CREATED)
+            return Response({'msg':'data change successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
         else:
             return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
+# orignal Prview  PrView 
+class OrPurchaseRequestNewView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk=None, format=None):
+        if pk is not None:
+            pr = PurchaseRequestNew.objects.get(pr_no=pk)
+            serializer = PurchaseRequestSerializer(pr)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            pr = PurchaseRequestNew.objects.all()
+            serializer = PurchaseRequestSerializer(pr, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
