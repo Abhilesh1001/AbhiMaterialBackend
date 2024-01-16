@@ -15,4 +15,5 @@ urlpatterns = [
     path('createpo', views.PurchaseOrderView.as_view()),
     path('createpo/<int:pk>/', views.PurchaseOrderView.as_view()),
     path('prview/<int:pk>/', views.OrPurchaseRequestNewView.as_view()),
+    path('poview/<int:pk>/', views.OrPuchaseOrderView.as_view()),
 ]

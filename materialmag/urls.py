@@ -7,7 +7,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('cus/',include('cusauth.urls')),
-    path('mat/',include('material.urls'))
+    path('mat/',include('material.urls')),
+    path('grn/',include('goodreceipt.urls'))
 ]
 if settings.DEBUG:
     urlpatterns +=static(settings.MEDIA_URL,document_root = settings.MEDIA_ROOT)

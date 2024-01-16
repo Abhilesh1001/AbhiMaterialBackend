@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'cusauth',
     'material',
     'rest_framework_simplejwt',
+    'goodreceipt',
 ]
 
 MIDDLEWARE = [

@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework import status 
 import json
 from collections import defaultdict
+from goodreceipt.models import GRN
 
 
 #Absolute View 
@@ -129,7 +130,7 @@ def index2(request):
     # Calculate remaining quantities by subtracting from PurchaseOrder
     for purchase in po:
         newVal = json.loads(purchase.item_pr)
-        print(newVal)
+        # print(newVal)
         for item in newVal:
             pr_no = item["pr_no"]
             line_no = item["line_no"]
@@ -217,7 +218,6 @@ def index(request):
 
 
 def itemPr(pr_no_require):
-    print(pr_no_require,type(pr_no_require))
     po = PurchaseOrder.objects.all()
     pr = PurchaseRequestNew.objects.all()
 
@@ -242,7 +242,7 @@ def itemPr(pr_no_require):
         newValPo = json.loads(purchase.item_pr)
         
         for item in newValPo:
-            print(item)
+            # print(item)
             pr_no = item["pr_no"]
             line_no = item["line_no"]
             material_qty = item["material_qty"]
@@ -435,6 +435,73 @@ class DeliveryAdressView(APIView):
     
 
 
+# remaning po view for GRN 
+def itemPo(po_no_require):
+    grn = GRN.objects.all()
+    po = PurchaseOrder.objects.all()
+
+    # Dictionary to store original quantities in PurchaseRequestNew
+    original_po_line = defaultdict(int)
+
+    # Calculate total quantities from PurchaseRequestNew
+    for pureq in po:
+        newValPo = json.loads(pureq.item_pr)
+
+        for item in newValPo:
+            po_no = pureq.po_no
+            po_line = item["po_line"]
+            material_qty = item["material_qty"]
+            if material_qty is not None:
+                original_po_line[(po_no, po_line)] += int(material_qty)
+
+    remaining_quantities = original_po_line.copy()
+
+    # Calculate remaining quantities by subtracting from PurchaseOrder
+    for purchase in grn:
+        newValPo = json.loads(purchase.item_po)
+        
+        for item in newValPo:
+            # print(item)
+            po_no = item["po_no"]
+            po_line = item["po_line"]
+            material_qty = item["material_qty"]
+            if material_qty is not None:
+              remaining_quantities[(po_no, po_line)] -= int(material_qty)
+
+    # Create a list of dictionaries for remaining quantities
+    remaining_quantities_list = []
+    for pureq in po:
+        newVal = json.loads(pureq.item_pr)
+        # print(newVal)
+        if pureq.po_no is po_no_require:
+            for item in newVal:
+                po_no = pureq.po_no
+                po_line = item["po_line"]
+                material_qty = remaining_quantities[(po_no, po_line)]
+                remaining_dict = {
+                    "line_no": item["line_no"],
+                    "pr_no": item["pr_no"],
+                     "po_line":po_line,
+                     "po_no":po_no,
+                    "material_no":item['material_no'],
+                    "material_name" : item["material_name"],
+                    "material_unit":item["material_unit"],
+                    "material_price" :item['material_price'],
+                    "material_tax":item["material_tax"],
+                    "total_tax" :item["total_tax"],
+                    "material_qty": material_qty,
+                    "total_amount":item["total_amount"],
+                    "material_text" :item['material_text'],
+                    
+
+                }
+                remaining_quantities_list.append(remaining_dict)
+        
+    
+    return json.dumps(remaining_quantities_list)
+
+
+
 class PurchaseOrderView(APIView):
     renderer_classes = [UserRenderer]
     permission_classes = [IsAuthenticated]
@@ -449,7 +516,9 @@ class PurchaseOrderView(APIView):
         
         if pk is not None:
             po = PurchaseOrder.objects.get(po_no=pk)
-            serilizer = PurchaseOrderSerilizer(po)
+            po_item = {"user" : po.user,"time":po.time,"item_pr":itemPo(pk),"vendor_address":po.vendor_address,"delivery_address":po.delivery_address,"maindata":po.maindata}
+            serilizer = PurchaseOrderSerilizer(po_item)
+            
             return Response(serilizer.data,status=status.HTTP_200_OK)
         else:
              po = PurchaseOrder.objects.all()
@@ -476,6 +545,55 @@ class PurchaseOrderView(APIView):
 
 
 
+
+
+from collections import defaultdict
+import json
+# orignal pr with no change if po created 
+def prignalprpreview(pk):
+    pr = PurchaseRequestNew.objects.get(pr_no=pk)
+    po = PurchaseOrder.objects.all()
+    original_po_line = defaultdict(int)
+
+    # Collect po_no values based on pr_no and line_no from PurchaseOrder
+    for item in po:
+        newValPo = json.loads(item.item_pr)
+        for newItem in newValPo:
+            pr_no = newItem['pr_no']
+            line_no = newItem['line_no']
+            original_po_line[(pr_no, line_no)] = item.po_no
+
+    # Create a copy of original_po_line dictionary
+    original_pr_line = original_po_line.copy()
+
+    # Process the item_json from the PurchaseRequestNew object
+    newValPr = json.loads(pr.item_json)
+    print(newValPr)
+    po_avilable_list = []
+    for itemPr in newValPr:
+        line_no = itemPr['line_no']
+        pr_no = pk
+        po_no = original_pr_line[(pr_no, line_no)]
+        print(f"pr_no: {pr_no}, line_no: {line_no}, po_no: {po_no}")
+        
+        remaining_dict = {
+                    "line_no": line_no,
+                    "material_name" : itemPr["material_name"],
+                    "material_unit":itemPr["material_unit"],
+                    "po_no":po_no,   
+                    "material_no":itemPr['material_no'],
+                    "material_price" :itemPr['material_price'],
+                    "material_text" :itemPr['material_text'],
+                    "total_price":itemPr["total_price"],
+                    "material_qty": itemPr["material_qty"],
+                }
+        po_avilable_list.append(remaining_dict)
+
+
+
+    return json.dumps(po_avilable_list)
+
+
 # orignal Prview  PrView 
 class OrPurchaseRequestNewView(APIView):
     renderer_classes = [UserRenderer]
@@ -484,9 +602,85 @@ class OrPurchaseRequestNewView(APIView):
     def get(self, request, pk=None, format=None):
         if pk is not None:
             pr = PurchaseRequestNew.objects.get(pr_no=pk)
-            serializer = PurchaseRequestSerializer(pr)
+            pr_item = {"user" : pr.user,"time":pr.time,"item_json":prignalprpreview(pk)}
+            serializer = PurchaseRequestSerializer(pr_item)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             pr = PurchaseRequestNew.objects.all()
             serializer = PurchaseRequestSerializer(pr, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+  
+
+
+# orignal PO view with no change if GRN created 
+def poorignalpreview(pk):
+    grn = GRN.objects.all()
+    po = PurchaseOrder.objects.get(pk=pk)
+    
+    original_grn_line = defaultdict(int)
+    for item in grn:
+        newValPo = json.loads(item.item_po)
+        for newItem in newValPo:
+            po_no = newItem['po_no']
+            po_line = newItem['po_line']
+            original_grn_line[(po_no, po_line)] = item.grn_no
+    
+
+    original_po_line = original_grn_line.copy()
+
+    newValPr = json.loads(po.item_pr)
+    grn_avilable_list = []
+    for itemPo in newValPr:
+        po_line = itemPo['po_line']
+        po_no = pk
+        grn_no = original_po_line[(po_no, po_line)]
+        print(f"po_no: {po_no}, po_linr: {po_line}, grn_no: {grn_no}")
+
+        original_quantities_json = itemPr(itemPo["pr_no"])
+        original_quantities = json.loads(original_quantities_json)
+
+        original_qty_pr = 0
+        for original_item in original_quantities:
+            if original_item["line_no"] == itemPo["line_no"]:
+                original_qty_pr = original_item["material_qty"]
+                break
+        
+        remaining_dict = {
+                    "line_no":itemPo["line_no"],
+                    "pr_no" :itemPo["pr_no"],
+                    "po_no":po_no,   
+                    "po_line": po_line,
+                    "grn_no":grn_no,
+                    "material_no":itemPo['material_no'],
+                    "material_name" : itemPo["material_name"],
+                    "material_unit":itemPo["material_unit"],
+                    "material_price" :itemPo['material_price'],
+                    "material_text" :itemPo['material_text'],
+                    "material_tax": itemPo["material_tax"],
+                    "total_amount":itemPo["total_amount"],
+                    "total_tax":itemPo["total_tax"],
+                    "material_qty": int(itemPo["material_qty"]),
+                    "orignaQtyPr" : original_qty_pr
+                                   
+                }
+        grn_avilable_list.append(remaining_dict)
+
+    return json.dumps(grn_avilable_list) 
+
+
+
+# orignal PO view 
+class OrPuchaseOrderView(APIView):
+    renderer_classes=[UserRenderer]
+    permission_classes =[IsAuthenticated]
+    def get(self,request,pk=None,format=None):
+        if pk is not None:
+            po = PurchaseOrder.objects.get(po_no=pk)
+            po_item = {"user" : po.user,"time":po.time,"item_pr":poorignalpreview(pk),"vendor_address":po.vendor_address,"delivery_address":po.delivery_address,"maindata":po.maindata,"po_no":pk}
+            serilizer = PurchaseOrderSerilizer(po_item)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        else:
+             po = PurchaseOrder.objects.all()
+             serilizer = PurchaseOrderSerilizer(po,many=True)
+             return Response(serilizer.data,status=status.HTTP_200_OK) 
