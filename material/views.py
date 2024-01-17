@@ -511,7 +511,9 @@ class PurchaseOrderView(APIView):
             serilizer.save()
             return Response({'msg':'data created successfully','data':serilizer.data})
         return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST) 
+    
 
+    # this is po view for GRN 
     def get(self,request,pk=None,format=None):
         
         if pk is not None:
@@ -613,7 +615,7 @@ class OrPurchaseRequestNewView(APIView):
   
 
 
-# orignal PO view with no change if GRN created 
+# orignal PO view with no change if GRN created j
 def poorignalpreview(pk):
     grn = GRN.objects.all()
     po = PurchaseOrder.objects.get(pk=pk)
