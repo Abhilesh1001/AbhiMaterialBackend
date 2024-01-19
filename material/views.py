@@ -367,16 +367,20 @@ class VendorView(APIView):
             return Response({'msg':'Data created Successfully'},status=status.HTTP_201_CREATED)
         else:
             return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
-        
-    def get(self,request,format=None):
-        vendor = Vendor.objects.all()
-        serilizer = VendorSErilizer(vendor,many=True)
-        return Response(serilizer.data)
     
     def get(self,request,pk=None,format=None):
-        vendor = Vendor.objects.get(s_no=pk)
-        serilizer = VendorSErilizer(vendor)
-        return Response(serilizer.data,status=status.HTTP_200_OK)
+        
+        if pk is not None:
+        
+            vendor = Vendor.objects.get(s_no=pk)
+            serilizer = VendorSErilizer(vendor)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        else :
+             vendor = Vendor.objects.all()
+             serilizer = VendorSErilizer(vendor,many=True)
+             return Response(serilizer.data)
+
+
     
     def put(self,request,pk=None,format=None):
         vendor = Vendor.objects.get(s_no=pk)
