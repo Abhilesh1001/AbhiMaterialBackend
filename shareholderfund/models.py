@@ -1,7 +1,6 @@
 from django.db import models
 from cusauth.models import User
 from django.utils.timezone import now 
-from django.utils import timezone
 # Create your models here.
 
 class ShareHolderName(models.Model):
@@ -30,14 +29,50 @@ class RdPerson(models.Model):
     rdp_id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255)
     user = models.ForeignKey(User,on_delete=models.CASCADE)
+    email =models.EmailField(max_length=50,default='')
+    pan_no =  models.CharField(max_length=50,default='')
+    phone_no = models.CharField(max_length=15,default='')
+    time = models.DateTimeField(default = now)
 
 
 
 class RDCollection(models.Model):
     person = models.ForeignKey(RdPerson, on_delete=models.CASCADE)
-    collection_date = models.DateField(default = now)
+    collection_date = models.DateTimeField(default = now)
     amount_collected = models.DecimalField(max_digits=10, decimal_places=2)
-    remarks = models.TextField(blank=True)
+    remarks = models.TextField(blank=True, null=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE)
+
+
+class LoanPerson(models.Model):
+    loan_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    email =models.EmailField(max_length=50,default='')
+    pan_no =  models.CharField(max_length=50,default='')
+    phone_no = models.CharField(max_length=15,default='')
+    time = models.DateTimeField(default = now)
+
+
+
+class LoanCollection(models.Model):
+    loan_person = models.ForeignKey(LoanPerson, on_delete=models.CASCADE)
+    collection_date = models.DateTimeField(default = now)
+    amount_collected = models.DecimalField(max_digits=10, decimal_places=2)
+    remarks = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+
+
+class LoanAmount(models.Model):
+    loan_person = models.ForeignKey(LoanPerson,on_delete= models.CASCADE)
+    loan_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    remarks = models.TextField(blank=True, null=True)
+    is_active = models.BooleanField()
+    time = models.DateTimeField(default = now)
+    
+
+
+
 
 
