@@ -27,4 +27,6 @@ urlpatterns = [
     path('loancoll',views.LoanCollectionBulkCreateView.as_view()),
     path('loancoll/<int:pk>',views.LoanCollectionBulkCreateView.as_view()),
     path('loanDataView',views.LoanDataAPIView.as_view()),
+    path('loanamount',views.LaonAmountView.as_view()),
+    path('loanamount/<int:pk>',views.LaonAmountView.as_view()),
 ]

@@ -2,8 +2,8 @@ from django.shortcuts import render,HttpResponse
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from .serilizer import ShareHolderFunsSerilizer,ShareHolderNameSerilizer,SerilzerHOlderFund,RDCollectionSerializer,RDCollectionDataSerializer,PersonSerializer,LoanCollectionDataSerializer,LoanCollectionSerializer,LoanPersonSerializer
-from .models import ShareHolderFuns,ShareHolderName,RdPerson,RDCollection,LoanCollection,LoanPerson
+from .serilizer import ShareHolderFunsSerilizer,ShareHolderNameSerilizer,SerilzerHOlderFund,RDCollectionSerializer,RDCollectionDataSerializer,PersonSerializer,LoanCollectionDataSerializer,LoanCollectionSerializer,LoanPersonSerializer,LaonaAmountSerilizer
+from .models import ShareHolderFuns,ShareHolderName,RdPerson,RDCollection,LoanCollection,LoanPerson,LoanAmount
 from rest_framework.permissions import IsAuthenticated
 from cusauth.renderers import UserRenderer
 
@@ -118,22 +118,23 @@ def shfview():
 
     orignal_pr_line = defaultdict(float)
 
-    for shf_item in shf_objects:  
-        orignal_pr_line[shf_item.sh_name.Sh_id] += shf_item.amount_credit - shf_item.amount_Debit
+    for shf_item in shf_objects:
+        amount_credit = float(shf_item.amount_credit) if shf_item.amount_credit else 0
+        amount_debit = float(shf_item.amount_Debit) if shf_item.amount_Debit else 0
+        orignal_pr_line[shf_item.sh_name.Sh_id] += amount_credit - amount_debit
 
     dictval = []    
     for item in orignal_pr_line:
-        shname =  ShareHolderName.objects.get(Sh_id=item)
-        dict = {
+        shname = ShareHolderName.objects.get(Sh_id=item)
+        dict_entry = {
             'shf_id': item,
-            'name':shname.name,
-            'totalInvested' : orignal_pr_line[item]
+            'name': shname.name,
+            'totalInvested': orignal_pr_line[item]
         }  
-        dictval.append(dict)  
+        dictval.append(dict_entry) 
     
     return dictval
     
-
 
 
 class CapitalDisclouserview(APIView):
@@ -225,6 +226,8 @@ class RdName(APIView):
 from django.utils.timezone import make_aware
 from datetime import datetime
 class RDDataAPIView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
     def post(self, request, *args, **kwargs):
         start_date = request.data.get('start_date')  # Format: 'YYYY-MM-DD'
         end_date = request.data.get('end_date')      # Format: 'YYYY-MM-DD'
@@ -269,13 +272,7 @@ class RDDataAPIView(APIView):
         return organized_data
 
 
-
-
-
-
 # Loan Collection DAta 
-
-
 
 class LoanCollectionBulkCreateView(APIView):
     renderer_classes = [UserRenderer]
@@ -355,6 +352,8 @@ class LoanName(APIView):
 from django.utils.timezone import make_aware
 from datetime import datetime
 class LoanDataAPIView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
     def post(self, request, *args, **kwargs):
         start_date = request.data.get('start_date')  # Format: 'YYYY-MM-DD'
         end_date = request.data.get('end_date')      # Format: 'YYYY-MM-DD'
@@ -399,3 +398,43 @@ class LoanDataAPIView(APIView):
         return organized_data
 
 
+# loan amount 
+
+class LaonAmountView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+
+    def post(self,request,format=None):
+        serilizer = LaonaAmountSerilizer(data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'Loan Amount Created','data':serilizer.data},status=status.HTTP_201_CREATED)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+    def get(self,request,pk=None,format=None):
+        if pk is not None:
+            loan = LoanAmount.objects.get(pk=pk) 
+            serilizer =  LaonaAmountSerilizer(loan)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        else:
+            loan =LoanAmount.objects.all()
+            serilizer = LaonaAmountSerilizer(loan,many=True)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+    
+    def put(self,request,pk=None,format=None):
+        loan =  LoanAmount.objects.get(pk=pk)
+        serilizer = LaonaAmountSerilizer(loan,data=request.data) 
+        if  serilizer.is_valid():
+            serilizer.save()
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self,request,pk=None,format=None):
+        loan =  LoanAmount.objects.get(pk=pk)
+        serilizer = LaonaAmountSerilizer(loan,data=request.data) 
+        if  serilizer.is_valid():
+            serilizer.save()
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    

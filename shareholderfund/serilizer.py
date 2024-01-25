@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ShareHolderFuns,ShareHolderName,RdPerson,RDCollection,LoanPerson,LoanCollection
+from .models import ShareHolderFuns,ShareHolderName,RdPerson,RDCollection,LoanPerson,LoanCollection,LoanAmount
 
 class ShareHolderFunsSerilizer(serializers.ModelSerializer):
     class Meta:
@@ -57,3 +57,10 @@ class LoanCollectionDataSerializer(serializers.ModelSerializer):
         fields = ['loan_person','amount_collected','user','remarks','collection_date']
 
 
+
+# loan Amount 
+
+class LaonaAmountSerilizer(serializers.ModelSerializer):
+    class Meta:
+        model = LoanAmount
+        fields = '__all__'

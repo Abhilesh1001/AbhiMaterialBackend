@@ -17,19 +17,20 @@ class AdminRDCollection(admin.ModelAdmin):
     list_display = ['person','amount_collected','remarks','user','collection_date']
 
 @admin.register(RdPerson)
-class AdminRdPerson(admin.ModelAdmin):
+class AdminRDPerson(admin.ModelAdmin):
     list_display = ['rdp_id','name','user','email','phone_no','time']
 
 
 @admin.register(LoanCollection)
-class AdminRDCollection(admin.ModelAdmin):
+class AdminLoanCollection(admin.ModelAdmin):
     list_display = ['loan_person','amount_collected','remarks','user','collection_date']
+    
 
 @admin.register(LoanPerson)
-class AdminRdPerson(admin.ModelAdmin):
+class AdminLoanPerson(admin.ModelAdmin):
     list_display = ['loan_id','name','user','email','phone_no','time']
 
 @admin.register(LoanAmount)
-class AdminRdPerson(admin.ModelAdmin):
-    list_display = ['loan_person','loan_amount','remarks','is_active','time']
+class AdminLoanAmount(admin.ModelAdmin):
+    list_display = ['id' ,'loan_person','loan_amount','remarks','is_active','time','opening_date','closing_date']
 

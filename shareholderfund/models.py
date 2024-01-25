@@ -1,6 +1,7 @@
 from django.db import models
 from cusauth.models import User
 from django.utils.timezone import now 
+
 # Create your models here.
 
 class ShareHolderName(models.Model):
@@ -62,6 +63,8 @@ class LoanCollection(models.Model):
     remarks = models.TextField(blank=True, null=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE)
 
+    
+
 
 class LoanAmount(models.Model):
     loan_person = models.ForeignKey(LoanPerson,on_delete= models.CASCADE)
@@ -70,6 +73,13 @@ class LoanAmount(models.Model):
     remarks = models.TextField(blank=True, null=True)
     is_active = models.BooleanField()
     time = models.DateTimeField(default = now)
+    opening_date = models.DateTimeField(default=now)
+    closing_date = models.DateTimeField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:  # This check ensures that it's a new loan (creation).
+            self.opening_date = now()
+        super().save(*args, **kwargs)
     
 
 
