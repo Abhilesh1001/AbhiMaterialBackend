@@ -147,9 +147,10 @@ def grnoignalpreview(pk):
             "material_qty": int(itemGrn["material_qty"]),
             "material_text": itemGrn['material_text'],
             "total_amount": itemGrn["total_amount"],
-            "original_qty_po": original_qty_po
+            "original_qty_po": original_qty_po 
             }
         grn_avilable_list.append(remaining_dict)
+
 
     return json.dumps(grn_avilable_list) 
 

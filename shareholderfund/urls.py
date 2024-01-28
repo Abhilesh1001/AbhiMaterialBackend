@@ -13,6 +13,7 @@ urlpatterns = [
     path('shfund/<int:pk>/', views.ShreHolderFundView.as_view()),
     path('shfund/<int:pk>/', views.ShreHolderFundView.as_view()),
     path('capialDisview',views.CapitalDisclouserview.as_view()),
+    
 
     # rd person ursls 
     path('rdname',views.RdName.as_view()),

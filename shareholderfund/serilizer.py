@@ -64,3 +64,28 @@ class LaonaAmountSerilizer(serializers.ModelSerializer):
     class Meta:
         model = LoanAmount
         fields = '__all__'
+
+
+class ShareHolderFunsDataDisSerializer(serializers.Serializer):
+    sh_name = serializers.CharField(source='sh_name.name')
+    Sh_id = serializers.CharField(source='sh_name.Sh_id')
+    shf_id = serializers.IntegerField()
+    amount_credit = serializers.FloatField()
+    amount_Debit = serializers.FloatField(default=0.0, allow_null=True)
+    time = serializers.DateTimeField()
+
+
+class RDCollectionSerializerData(serializers.ModelSerializer):
+    person_id = serializers.IntegerField(source='person.rdp_id')
+    person_name = serializers.CharField(source='person.name')
+    class Meta:
+        model = RDCollection
+        fields = ['id', 'person_id', 'person_name', 'amount_collected', 'remarks', 'collection_date']
+
+
+class LoanCollectionSerilizerData(serializers.ModelSerializer):
+    person_id = serializers.IntegerField(source='loan_person.loan_id')
+    person_name = serializers.CharField(source='loan_person.name')
+    class Meta:
+        model= LoanCollection
+        fields =['id','person_id', 'person_name', 'amount_collected', 'remarks', 'collection_date']

@@ -2,10 +2,11 @@ from django.shortcuts import render,HttpResponse
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from .serilizer import ShareHolderFunsSerilizer,ShareHolderNameSerilizer,SerilzerHOlderFund,RDCollectionSerializer,RDCollectionDataSerializer,PersonSerializer,LoanCollectionDataSerializer,LoanCollectionSerializer,LoanPersonSerializer,LaonaAmountSerilizer
+from .serilizer import ShareHolderFunsSerilizer,ShareHolderNameSerilizer,SerilzerHOlderFund,RDCollectionSerializer,RDCollectionDataSerializer,PersonSerializer,LoanCollectionDataSerializer,LoanCollectionSerializer,LoanPersonSerializer,LaonaAmountSerilizer,ShareHolderFunsDataDisSerializer,RDCollectionSerializerData,LoanCollectionSerilizerData
 from .models import ShareHolderFuns,ShareHolderName,RdPerson,RDCollection,LoanCollection,LoanPerson,LoanAmount
 from rest_framework.permissions import IsAuthenticated
 from cusauth.renderers import UserRenderer
+import json
 
 
 
@@ -21,22 +22,42 @@ class ShreHolderFundView(APIView):
         serilizer =  ShareHolderFunsSerilizer(data=request.data)
         if serilizer.is_valid():
             serilizer.save()
-            return Response({'msg':'data creates Successfully'},status=status.HTTP_201_CREATED)
+            return Response({'msg':'Data creates Successfully'},status=status.HTTP_201_CREATED)
         else:
             return Response(serilizer.errors)
         
     def get(self,request,pk=None,format=None):
 
         if pk is not None:
-            sh = ShareHolderFuns.objects.get(Sh_id=pk)
-            serilizer =  ShareHolderFunsSerilizer(sh)
+            # get all data of pk person 
+            
+            sh = ShareHolderFuns.objects.filter(sh_name=pk)
+            
+            dict =  []
+            for item in sh:
+                print(item.amount_Debit)
+                dict1= {
+                    "name ":item.sh_name.name,
+                    "shf_id":item.shf_id,
+                    "Sh_id":item.sh_name.Sh_id,
+                    "amount_credit":item.amount_credit,
+                    "amount_Debit":item.amount_Debit,
+                    "time":item.time
+                }
+
+                dict.append(dict1)
+            print(dict)
+
+            serilizer =  ShareHolderFunsDataDisSerializer(sh,many=True)
+            
+            
             return Response(serilizer.data,status=status.HTTP_200_OK)
         else:
             sh = ShareHolderFuns.objects.all()
-            serilizer =  ShareHolderFunsSerilizer(sh,many= True)
+            serilizer =  ShareHolderFunsDataDisSerializer(sh,many= True)
+
             return Response(serilizer.data,status=status.HTTP_200_OK)
 
-        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
 
     def put(self,request,pk=None,format=None):
         sh = ShareHolderFuns.objects.get(Sh_id=pk)
@@ -96,11 +117,12 @@ class ShreHolderNameView(APIView):
         return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
         
     def patch(self,request,pk=None,format=None):
-        sh = ShareHolderFuns.objects.get(Sh_id=pk)
+        sh = ShareHolderName.objects.get(Sh_id=pk)
+        print(sh)
         serilizer = ShareHolderNameSerilizer(sh,data=request.data)
         if  serilizer.is_valid():
             serilizer.save()
-            return Response(serilizer.data,status=status.HTTP_200_OK)
+            return Response({'msg':'Holder Updated Successfully','data':serilizer.data},status=status.HTTP_200_OK)
         return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
 
     def put(self,request,pk=None,format=None):
@@ -162,9 +184,10 @@ class RDCollectionBulkCreateView(APIView):
     
     def get(self,request,pk=None,format=None):
         if pk is not None:
-            rd = RDCollection.object.get(pk=pk)
-            serilizer =  RDCollectionSerializer(rd)
-            return Response(serilizer.data)
+            rd_personcoll_data = RDCollection.objects.filter(person=pk)
+            serializer = RDCollectionSerializerData(rd_personcoll_data, many=True)
+            
+            return Response(serializer.data)
         else:
             rd = RDCollection.objects.all()
             serilizer = RDCollectionSerializer(rd,many=True)
@@ -218,7 +241,7 @@ class RdName(APIView):
         serilizer = PersonSerializer(rpd,data=request.data) 
         if  serilizer.is_valid():
             serilizer.save()
-            return Response(serilizer.data,status=status.HTTP_200_OK)
+            return Response({'msg':'Rd person Updated Successfully','data':serilizer.data},status=status.HTTP_200_OK)
         return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -288,9 +311,9 @@ class LoanCollectionBulkCreateView(APIView):
     
     def get(self,request,pk=None,format=None):
         if pk is not None:
-            rd = LoanCollection.object.get(pk=pk)
-            serilizer =  LoanCollectionSerializer(rd)
-            return Response(serilizer.data)
+            loan_perperson = LoanCollection.objects.filter(loan_person=pk)
+            serializer = LoanCollectionSerilizerData(loan_perperson, many=True)
+            return Response(serializer.data)
         else:
             rd = LoanCollection.objects.all()
             serilizer = LoanCollectionSerializer(rd,many=True)
@@ -344,7 +367,7 @@ class LoanName(APIView):
         serilizer = LoanPersonSerializer(rpd,data=request.data) 
         if  serilizer.is_valid():
             serilizer.save()
-            return Response(serilizer.data,status=status.HTTP_200_OK)
+            return Response({'msg':'Loan Person Updated Successfully','data':serilizer.data},status=status.HTTP_200_OK)
         return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -438,3 +461,4 @@ class LaonAmountView(APIView):
         return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
 
     
+

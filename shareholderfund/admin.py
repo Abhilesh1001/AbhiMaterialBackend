@@ -14,7 +14,7 @@ class AdminSShareHolderFuns(admin.ModelAdmin):
 
 @admin.register(RDCollection)
 class AdminRDCollection(admin.ModelAdmin):
-    list_display = ['person','amount_collected','remarks','user','collection_date']
+    list_display = ['id','person','amount_collected','remarks','user','collection_date']
 
 @admin.register(RdPerson)
 class AdminRDPerson(admin.ModelAdmin):
@@ -23,7 +23,7 @@ class AdminRDPerson(admin.ModelAdmin):
 
 @admin.register(LoanCollection)
 class AdminLoanCollection(admin.ModelAdmin):
-    list_display = ['loan_person','amount_collected','remarks','user','collection_date']
+    list_display = ['id','loan_person','amount_collected','remarks','user','collection_date']
     
 
 @admin.register(LoanPerson)
