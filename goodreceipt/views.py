@@ -4,14 +4,14 @@ from django.shortcuts import render,HttpResponse
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from .models import GRN
-from .serilizer import GRNSerilizer
+from .models import GRN,MIR,MaterialIssue
+from .serilizer import GRNSerilizer,MiroSerilizer,MaterialIssueSerilizer
 from cusauth.models import User
 from cusauth.renderers import UserRenderer
 from material.models import PurchaseOrder
 from  rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import BasePermission
 
-# Create your views here.
 
 def index(request):
     return HttpResponse('ok')
@@ -28,7 +28,7 @@ def itemPo(po_no_require):
     # Calculate total quantities from PurchaseOrder
     for pureq in po:
         newValPo = json.loads(pureq.item_pr)
-
+        # print('newval',newValPo)
         for item in newValPo:
             po_no = pureq.po_no
             po_line = item["po_line"]
@@ -120,7 +120,6 @@ class GRNView(APIView):
 
 def grnoignalpreview(pk):
     grn = GRN.objects.get(grn_no=pk)
-    
 
     newValgrn = json.loads(grn.item_po)
     grn_avilable_list =[]
@@ -128,9 +127,11 @@ def grnoignalpreview(pk):
         original_qty_po = 0
         original_quantities_json = itemPo(itemGrn["po_no"])
         original_quantities = json.loads(original_quantities_json)
+        # print('orignal po',original_quantities)
         for original_item in original_quantities:
             if original_item["po_line"] == itemGrn["po_line"]:
                 original_qty_po = original_item["material_qty"]
+                # print(original_qty_po)
                 break
         remaining_dict = {
             "line_no": itemGrn["line_no"],
@@ -147,7 +148,7 @@ def grnoignalpreview(pk):
             "material_qty": int(itemGrn["material_qty"]),
             "material_text": itemGrn['material_text'],
             "total_amount": itemGrn["total_amount"],
-            "original_qty_po": original_qty_po 
+            "original_qty_po": original_qty_po + int(itemGrn["material_qty"])
             }
         grn_avilable_list.append(remaining_dict)
 
@@ -173,6 +174,64 @@ class OrGRNView(APIView):
             serilzer =GRNSerilizer(grn,many=True)
             return Response(serilzer.data,status=status.HTTP_200_OK)
         
+class MiroView(APIView):
+    permission_classes =[IsAuthenticated]
+    renderer_classes= [UserRenderer]
 
+    def post(self,request,format=None):
+        serilizer = MiroSerilizer(data=request.data) 
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'Data created SuccessFully','data':serilizer.data},status=status.HTTP_201_CREATED)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self,request,pk=None,format=None):
+        if pk is not None:
+            miro =  MIR.objects.get(mir_no=pk)
+            serillizer = MiroSerilizer(miro)
+            return (serillizer.data)
+        else:
+            miro = MIR.objects.all()
+            serillizer = MiroSerilizer(miro,many=True)
+            return (serillizer.data)
+    
+    def patch(self,request,pk=None,format=None):
+        miro = MIR.objects.get(mir_no=pk)
+        serilizer =  MiroSerilizer(miro,data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'Data Updated Sussfully','data':serilizer.data},status=status.HTTP_200_OK)
+
+            
         
+class MaterialIssueView(APIView):
+    permission_classes =[IsAuthenticated]
+    renderer_classes= [UserRenderer]
+
+    def post(self,request,format=None):
+        serilizer = MaterialIssueSerilizer(data=request.data) 
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'Data created SuccessFully','data':serilizer.data},status=status.HTTP_201_CREATED)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self,request,pk=None,format=None):
+        if pk is not None:
+            miro =  MIR.objects.get(mir_no=pk)
+            serillizer = MaterialIssueSerilizer(miro)
+            return (serillizer.data)
+        else:
+            miro = MIR.objects.all()
+            serillizer = MaterialIssueSerilizer(miro,many=True)
+            return (serillizer.data)
+    
+    def patch(self,request,pk=None,format=None):
+        miro = MIR.objects.get(mir_no=pk)
+        serilizer =  MaterialIssueSerilizer(miro,data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'Data Updated Sussfully','data':serilizer.data},status=status.HTTP_200_OK)
+
+            
+
 

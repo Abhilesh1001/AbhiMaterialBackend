@@ -1,7 +1,7 @@
 from django.db import models
 
 # Create your models here.
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser,PermissionsMixin
 # custom user model 
 class MyUserManager(BaseUserManager):
     def create_user(self, email,name,tc,password=None,password2=None):
@@ -37,10 +37,10 @@ class MyUserManager(BaseUserManager):
         return user
 
 
-class User(AbstractBaseUser):
+class User(AbstractBaseUser,PermissionsMixin):
     email = models.EmailField(
         verbose_name="Email",
-        max_length=255,
+        max_length=255, 
         unique=True,
     )
     name = models.CharField(max_length=200)
@@ -61,7 +61,7 @@ class User(AbstractBaseUser):
     def has_perm(self, perm, obj=None):
         "Does the user have a specific permission?"
         # Simplest possible answer: Yes, always
-        return self.is_admin
+        return self.is_admin or self.user_permissions.filter(codename=perm).exists()
 
     def has_module_perms(self, app_label):
         "Does the user have permissions to view the app `app_label`?"
