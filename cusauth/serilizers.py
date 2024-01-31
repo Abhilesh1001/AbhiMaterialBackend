@@ -79,8 +79,8 @@ class SendPasswordResetEmailSerilizer(serializers.Serializer):
             user = User.objects.get(email=email)
             uid = urlsafe_base64_encode(force_bytes(user.id))
             token =PasswordResetTokenGenerator().make_token(user)
-            link = 'https://reactfront-gamma.vercel.app/#/resetpassworduidtoken/'+uid+'/'+token
-            print('password Reset link',link)
+            link = 'https://materialmovement.vercel.app/signup/forgotpassword/'+uid+'/'+token
+            
             # new Added 
             send_email_to(link,user)
             return attrs

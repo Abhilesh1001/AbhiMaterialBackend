@@ -172,4 +172,7 @@ class OrGRNView(APIView):
             grn = GRN.objects.all()
             serilzer =GRNSerilizer(grn,many=True)
             return Response(serilzer.data,status=status.HTTP_200_OK)
+        
+
+        
 
