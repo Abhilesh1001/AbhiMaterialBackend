@@ -78,18 +78,36 @@ def itemPo(po_no_require):
     return json.dumps(remaining_quantities_list)
 
 
+class GRNPermission(BasePermission):
+    def has_permission(self, request, view):
+        required_permissions = [
+            'create_grn',
+            'post_grn',
+            'view_grn',
+            'delete_grn',
+        ]
+
+        has_all_permissions = all(request.user.has_perm(permission) for permission in required_permissions)
+        if not has_all_permissions:
+            print(f'User does not have all required permissions: {required_permissions}')
+
+
+        return has_all_permissions
+
+
 class GRNView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,GRNPermission]
     renderer_classes = [UserRenderer]
     def post(self,request,format=None):
         serilizer = GRNSerilizer(data=request.data)
         if serilizer.is_valid():
             serilizer.save()
-            return Response({'msg':'Data Created Sussfully','data':serilizer.data},status=status.HTTP_201_CREATED)
+            return Response({'msg':'Data Created Sucessfully','data':serilizer.data},status=status.HTTP_201_CREATED)
         
         return Response(serilizer.errors)
     
     def get(self,request,pk=None,format=None):
+        
         if pk is not None:
             grn = GRN.objects.get(grn_no = pk)
             serilzer =  GRNSerilizer(grn)
@@ -157,12 +175,15 @@ def grnoignalpreview(pk):
 
 
 
-
 class OrGRNView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,GRNPermission]
     renderer_classes = [UserRenderer]
 
     def get(self,request,pk=None,format=None):
+        
+        if not request.user.has_perm('view_grn'):
+            return Response({'error': 'You do not have permission to view GRN.'}, status=status.HTTP_403_FORBIDDEN)
+         
         if pk is not None:
             grn = GRN.objects.get(grn_no = pk)           
             grn_item = {"user" : grn.user,"time":grn.time,"item_po":grnoignalpreview(pk),"vendor_address":grn.vendor_address,"delivery_address":grn.delivery_address,"maindata":grn.maindata,"billing":grn.billing,"grn_no":pk}
