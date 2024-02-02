@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from .models import GRN,MIR,MaterialIssue
-from .serilizer import GRNSerilizer,MiroSerilizer,MaterialIssueSerilizer
+from .serilizer import GRNSerilizer,MiroSerilizer,MaterialIssueSerilizer,POinsertinIRNserilizer
 from cusauth.models import User
 from cusauth.renderers import UserRenderer
 from material.models import PurchaseOrder
@@ -222,8 +222,7 @@ class MiroView(APIView):
         if serilizer.is_valid():
             serilizer.save()
             return Response({'msg':'Data Updated Sussfully','data':serilizer.data},status=status.HTTP_200_OK)
-
-            
+          
         
 class MaterialIssueView(APIView):
     permission_classes =[IsAuthenticated]
@@ -255,4 +254,40 @@ class MaterialIssueView(APIView):
 
             
 
+class POinINRView(APIView):
 
+    def get(self,request,pk=None,format=None):
+        grn = GRN.objects.all()
+        pono = PurchaseOrder.objects.get(pk=pk)
+        
+        dicttonery = []
+        for po in grn:
+            item_po =  json.loads(po.item_po)
+            dict = {}
+            for item in item_po:
+                if int(item['po_no']) is pk:
+                    dict = {
+                        "line_no" : item["line_no"],
+                        "pr_no": item["pr_no"],
+                        "po_line":item["po_line"],
+                        "po_no":item["po_no"],
+                        "grn_line":item["grn_line"],
+                        'grn_no':po.grn_no,
+                        "material_no":item["material_no"],
+                        'material_name':item["material_name"],
+                        'material_unit':item["material_unit"],
+                        'material_price':item["material_price"],
+                        'material_tax':float(item["material_tax"]),
+                        'total_tax':item["total_tax"],
+                        'material_qty':item["material_qty"],
+                        'material_text':item["material_text"],
+                        'total_amount':item["total_amount"],
+                        'billing':po.billing
+                    }
+                    dicttonery.append(dict)
+        newPoforIRN = json.dumps(dicttonery)
+        # print(newPoforIRN)
+        poreturn = {"po_no":pono.po_no,"user":pono.user,'time':pono.time,"vendor_address":pono.vendor_address,'delivery_address':pono.delivery_address,'item_pr':newPoforIRN}
+        serilizer = POinsertinIRNserilizer(poreturn)
+       
+        return Response(serilizer.data)

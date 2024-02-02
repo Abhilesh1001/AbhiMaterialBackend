@@ -12,9 +12,14 @@ urlpatterns = [
     path('mirocreate',views.MiroView.as_view()),
     path('mirocreated/<int:pk>/',views.MiroView.as_view()),
 
+    # IRN PO Insert 
+    path('irnpoinsert/<int:pk>/',views.POinINRView.as_view()),
+
     # materialIssue    
     path('materialissuecreate',views.MaterialIssueView.as_view()),
     path('materialissuecreate/<int:pk>/',views.MaterialIssueView.as_view()),
+    
+    
     
    
    
