@@ -208,9 +208,11 @@ class MiroView(APIView):
 
     def get(self,request,pk=None,format=None):
         if pk is not None:
+
             miro =  MIR.objects.get(mir_no=pk)
             serillizer = MiroSerilizer(miro)
-            return (serillizer.data)
+            return Response(serillizer.data)
+            
         else:
             miro = MIR.objects.all()
             serillizer = MiroSerilizer(miro,many=True)
@@ -256,38 +258,55 @@ class MaterialIssueView(APIView):
 
 class POinINRView(APIView):
 
-    def get(self,request,pk=None,format=None):
+   def get(self, request, pk=None, format=None):
         grn = GRN.objects.all()
+        mir = MIR.objects.all()
         pono = PurchaseOrder.objects.get(pk=pk)
+
+        original_grn_line = defaultdict(list)
+
+        for item in mir:
+            item_grn = json.loads(item.item_grn)
+            for items in item_grn:
+                if items["po_no"] == pk:
+                    original_grn_line[(items["grn_line"], items["grn_no"])].append(items)
         
+        print('original lineData', original_grn_line)
+    
         dicttonery = []
+
         for po in grn:
             item_po =  json.loads(po.item_po)
             dict = {}
             for item in item_po:
-                if int(item['po_no']) is pk:
-                    dict = {
-                        "line_no" : item["line_no"],
-                        "pr_no": item["pr_no"],
-                        "po_line":item["po_line"],
-                        "po_no":item["po_no"],
-                        "grn_line":item["grn_line"],
-                        'grn_no':po.grn_no,
-                        "material_no":item["material_no"],
-                        'material_name':item["material_name"],
-                        'material_unit':item["material_unit"],
-                        'material_price':item["material_price"],
-                        'material_tax':float(item["material_tax"]),
-                        'total_tax':item["total_tax"],
-                        'material_qty':item["material_qty"],
-                        'material_text':item["material_text"],
-                        'total_amount':item["total_amount"],
-                        'billing':po.billing
-                    }
-                    dicttonery.append(dict)
+                if int(item['po_no']) == pk:
+                    print('grompo', item["grn_line"], po.grn_no)    
+                    if (item["grn_line"], po.grn_no) not in original_grn_line:
+                        dict = {
+                            "line_no": item["line_no"],
+                            "pr_no": item["pr_no"],
+                            "po_line": item["po_line"],
+                            "po_no": item["po_no"],
+                            "grn_line": item["grn_line"],
+                            'grn_no': po.grn_no,
+                            "material_no": item["material_no"],
+                            'material_name': item["material_name"],
+                            'material_unit': item["material_unit"],
+                            'material_price': item["material_price"],
+                            'material_tax': float(item["material_tax"]),
+                            'total_tax': item["total_tax"],
+                            'material_qty': item["material_qty"],
+                            'material_text': item["material_text"],
+                            'total_amount': item["total_amount"],
+                            'billing': po.billing
+                        }
+                        dicttonery.append(dict)
+
         newPoforIRN = json.dumps(dicttonery)
-        # print(newPoforIRN)
-        poreturn = {"po_no":pono.po_no,"user":pono.user,'time':pono.time,"vendor_address":pono.vendor_address,'delivery_address':pono.delivery_address,'item_pr':newPoforIRN}
-        serilizer = POinsertinIRNserilizer(poreturn)
+
+        poreturn = {"po_no": pono.po_no, "user": pono.user, 'time': pono.time,
+                    "vendor_address": pono.vendor_address, 'delivery_address': pono.delivery_address,
+                    'item_pr': newPoforIRN}
+        serializer = POinsertinIRNserilizer(poreturn)
        
-        return Response(serilizer.data)
+        return Response(serializer.data)

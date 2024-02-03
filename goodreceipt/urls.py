@@ -19,8 +19,4 @@ urlpatterns = [
     path('materialissuecreate',views.MaterialIssueView.as_view()),
     path('materialissuecreate/<int:pk>/',views.MaterialIssueView.as_view()),
     
-    
-    
-   
-   
 ]

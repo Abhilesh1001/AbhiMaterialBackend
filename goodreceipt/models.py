@@ -17,7 +17,7 @@ class GRN(models.Model):
 
 
 class MIR(models.Model):
-    mir_no = models.AutoField(primary_key=True,default=0)
+    mir_no = models.AutoField(primary_key=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     time = models.DateTimeField(default = now)
     vendor_address = models.CharField(max_length=100000,default='')
