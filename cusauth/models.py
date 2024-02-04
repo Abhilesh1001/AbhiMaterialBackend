@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 
 class MyUserManager(BaseUserManager):
-    def create_user(self, email, name, tc, password=None):
+    def create_user(self, email, name, tc, password=None,password2=None):
         """
         Creates and saves a regular user with the given email, name, tc, and password.
         """

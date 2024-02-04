@@ -18,5 +18,9 @@ urlpatterns = [
     # materialIssue    
     path('materialissuecreate',views.MaterialIssueView.as_view()),
     path('materialissuecreate/<int:pk>/',views.MaterialIssueView.as_view()),
+
+    # material stock 
+    path('materialstock',views.MaterilStock.as_view()),
+    path('materialstock/<int:pk>/',views.MaterilStock.as_view()),
     
 ]

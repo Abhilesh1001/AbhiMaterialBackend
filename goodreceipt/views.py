@@ -8,7 +8,7 @@ from .models import GRN,MIR,MaterialIssue
 from .serilizer import GRNSerilizer,MiroSerilizer,MaterialIssueSerilizer,POinsertinIRNserilizer
 from cusauth.models import User
 from cusauth.renderers import UserRenderer
-from material.models import PurchaseOrder
+from material.models import PurchaseOrder,Material
 from  rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import BasePermission
 
@@ -257,6 +257,7 @@ class MaterialIssueView(APIView):
             
 
 class POinINRView(APIView):
+   
 
    def get(self, request, pk=None, format=None):
         grn = GRN.objects.all()
@@ -310,3 +311,59 @@ class POinINRView(APIView):
         serializer = POinsertinIRNserilizer(poreturn)
        
         return Response(serializer.data)
+   
+
+
+
+def materilqty(pk=None):
+    grn = GRN.objects.all()
+    orignal_material =  defaultdict(float)
+    for item in grn:
+        itemgrn = json.loads(item.item_po)
+        for items in itemgrn:
+            material_no = items["material_no"]
+            material_name = items['material_name']
+            material_unit = items['material_unit']
+            orignal_material[material_no,material_name,material_unit] += float(items["material_qty"]) 
+    # print(orignal_material)
+    list = []
+    dict ={}
+    if pk is not None:
+        print('ok')
+        for item in orignal_material:
+          if item[0] is pk:
+            dict ={
+            "material_no" : item[0],
+            "material_name" : item[1],
+            "material_unit" : item[2],
+            "material_qty" : orignal_material[item[0],item[1],item[2]]     
+            }
+            list.append(dict)
+    else:
+        for item in orignal_material:
+          dict ={
+            "material_no" : item[0],
+            "material_name" : item[1],
+            "material_unit" : item[2],
+            "material_qty" : orignal_material[item[0],item[1],item[2]]     
+            }
+          list.append(dict)
+
+    print(list)
+    
+
+
+
+    
+
+
+# materila Stock 
+   
+class MaterilStock(APIView):
+    def get(self,request,pk=None,format=None):
+        if pk is not None:
+            materilqty(pk)
+            return Response({'msg':'pk is not none'})
+        else:
+            materilqty()
+            return Response({'msg':'pk is none'})
