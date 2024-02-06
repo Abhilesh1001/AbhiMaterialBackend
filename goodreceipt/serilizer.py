@@ -26,3 +26,11 @@ class POinsertinIRNserilizer(serializers.ModelSerializer):
     class Meta:
         model = PurchaseOrder
         fields = ['po_no','user','time','vendor_address','delivery_address','item_pr']
+
+
+class MaterialStockSerilizer(serializers.Serializer):
+    material_no = serializers.IntegerField()
+    material_name = serializers.CharField(max_length=100)
+    material_unit = serializers.CharField(max_length=50)
+    material_qty = serializers.FloatField()
+    

@@ -31,4 +31,5 @@ class MaterialIssue(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     time = models.DateTimeField(default = now)
     item_issue = models.CharField(max_length=1000000,default='')
+    remarks = models.CharField(max_length=1000,default='')
 

@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from .models import GRN,MIR,MaterialIssue
-from .serilizer import GRNSerilizer,MiroSerilizer,MaterialIssueSerilizer,POinsertinIRNserilizer
+from .serilizer import GRNSerilizer,MiroSerilizer,MaterialIssueSerilizer,POinsertinIRNserilizer,MaterialStockSerilizer
 from cusauth.models import User
 from cusauth.renderers import UserRenderer
 from material.models import PurchaseOrder,Material
@@ -138,7 +138,17 @@ class GRNView(APIView):
 
 def grnoignalpreview(pk):
     grn = GRN.objects.get(grn_no=pk)
+    
 
+    mir_orgnal_no = defaultdict(int)
+    mir = MIR.objects.all()
+
+    for item in mir:
+        item_grn = json.loads(item.item_grn)
+        for items in item_grn:
+            mir_orgnal_no[(items["grn_line"],items["grn_no"])] = item.mir_no
+
+    print(mir_orgnal_no[(1,10)])
     newValgrn = json.loads(grn.item_po)
     grn_avilable_list =[]
     for itemGrn in newValgrn:
@@ -150,7 +160,7 @@ def grnoignalpreview(pk):
             if original_item["po_line"] == itemGrn["po_line"]:
                 original_qty_po = original_item["material_qty"]
                 # print(original_qty_po)
-                break
+                break 
         remaining_dict = {
             "line_no": itemGrn["line_no"],
             "pr_no": itemGrn["pr_no"],
@@ -166,10 +176,11 @@ def grnoignalpreview(pk):
             "material_qty": int(itemGrn["material_qty"]),
             "material_text": itemGrn['material_text'],
             "total_amount": itemGrn["total_amount"],
-            "original_qty_po": original_qty_po + int(itemGrn["material_qty"])
+            "original_qty_po": original_qty_po + int(itemGrn["material_qty"]), 
+            "mir_no" : mir_orgnal_no[(itemGrn["grn_line"],pk)]
             }
         grn_avilable_list.append(remaining_dict)
-
+  
 
     return json.dumps(grn_avilable_list) 
 
@@ -257,7 +268,8 @@ class MaterialIssueView(APIView):
             
 
 class POinINRView(APIView):
-   
+   permission_classes =[IsAuthenticated]
+   renderer_classes= [UserRenderer]
 
    def get(self, request, pk=None, format=None):
         grn = GRN.objects.all()
@@ -321,7 +333,7 @@ def materilqty(pk=None):
     for item in grn:
         itemgrn = json.loads(item.item_po)
         for items in itemgrn:
-            material_no = items["material_no"]
+            material_no = int(items["material_no"])
             material_name = items['material_name']
             material_unit = items['material_unit']
             orignal_material[material_no,material_name,material_unit] += float(items["material_qty"]) 
@@ -329,11 +341,12 @@ def materilqty(pk=None):
     list = []
     dict ={}
     if pk is not None:
-        print('ok')
         for item in orignal_material:
+          print(item[0])
+          print(item)
           if item[0] is pk:
             dict ={
-            "material_no" : item[0],
+            "material_no" : int(item[0]),
             "material_name" : item[1],
             "material_unit" : item[2],
             "material_qty" : orignal_material[item[0],item[1],item[2]]     
@@ -342,28 +355,27 @@ def materilqty(pk=None):
     else:
         for item in orignal_material:
           dict ={
-            "material_no" : item[0],
+            "material_no" : int(item[0]),
             "material_name" : item[1],
             "material_unit" : item[2],
             "material_qty" : orignal_material[item[0],item[1],item[2]]     
             }
           list.append(dict)
 
-    print(list)
+    return list 
     
 
-
-
-    
 
 
 # materila Stock 
    
 class MaterilStock(APIView):
+    permission_classes =[IsAuthenticated]
+    renderer_classes= [UserRenderer]
     def get(self,request,pk=None,format=None):
         if pk is not None:
-            materilqty(pk)
-            return Response({'msg':'pk is not none'})
+            materialStock =  materilqty(pk)
+            return Response(materialStock)
         else:
-            materilqty()
-            return Response({'msg':'pk is none'})
+            materialStock =  materilqty()
+            return Response(materialStock)
