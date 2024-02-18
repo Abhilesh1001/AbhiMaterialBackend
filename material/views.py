@@ -282,7 +282,7 @@ class MaterialView(APIView):
         serilizer = MaterialSerlizer(data=request.data)
         if serilizer.is_valid():
             serilizer.save()
-            return Response({'msg':'data created successfully','data':serilizer.data})
+            return Response({'msg':'Data created successfully ','data':serilizer.data})
         return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
 
     def get(self,request,pk=None,format=None):
@@ -297,7 +297,7 @@ class MaterialView(APIView):
             return Response(serilizer.data)
 
     
-    
+
     def put(self,request,pk=None,format=None):
         mat = Material.objects.get(pk=pk)
         # print(mat)
@@ -312,7 +312,7 @@ class MaterialView(APIView):
         serilizer = MaterialSerlizer(mat,data=request.data)
         if serilizer.is_valid():
             serilizer.save()
-            return Response(serilizer.data)
+            return Response({'msg': 'Material Updated ','data':serilizer.data},status=status.HTTP_200_OK)
         return Response(serilizer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     
@@ -364,7 +364,7 @@ class VendorView(APIView):
         serilizer = VendorSErilizer(data=request.data)
         if serilizer.is_valid():
             serilizer.save()
-            return Response({'msg':'Data created Successfully'},status=status.HTTP_201_CREATED)
+            return Response({'msg':'Data created Successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
         else:
             return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
     
@@ -395,7 +395,7 @@ class VendorView(APIView):
         serilizer = VendorSErilizer(vendor,data=request.data)
         if serilizer.is_valid():
             serilizer.save()
-            return Response({'msg':'data change successfully'},status=status.HTTP_201_CREATED)
+            return Response({'msg':'Data change successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
         else:
             return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
     
@@ -667,7 +667,7 @@ def poorignalpreview(pk):
                     "total_amount":itemPo["total_amount"],
                     "total_tax":itemPo["total_tax"],
                     "material_qty": int(itemPo["material_qty"]),
-                    "orignaQtyPr" : original_qty_pr
+                    "orignaQtyPr" : original_qty_pr + int(itemPo["material_qty"])
                                    
                 }
         grn_avilable_list.append(remaining_dict)

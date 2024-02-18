@@ -148,7 +148,6 @@ def grnoignalpreview(pk):
         for items in item_grn:
             mir_orgnal_no[(items["grn_line"],items["grn_no"])] = item.mir_no
 
-    print(mir_orgnal_no[(1,10)])
     newValgrn = json.loads(grn.item_po)
     grn_avilable_list =[]
     for itemGrn in newValgrn:
@@ -245,7 +244,7 @@ class MaterialIssueView(APIView):
         serilizer = MaterialIssueSerilizer(data=request.data) 
         if serilizer.is_valid():
             serilizer.save()
-            return Response({'msg':'Data created SuccessFully','data':serilizer.data},status=status.HTTP_201_CREATED)
+            return Response({'msg':'Data created Successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
         return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
 
     def get(self,request,pk=None,format=None):
@@ -284,7 +283,6 @@ class POinINRView(APIView):
                 if items["po_no"] == pk:
                     original_grn_line[(items["grn_line"], items["grn_no"])].append(items)
         
-        print('original lineData', original_grn_line)
     
         dicttonery = []
 
@@ -292,8 +290,7 @@ class POinINRView(APIView):
             item_po =  json.loads(po.item_po)
             dict = {}
             for item in item_po:
-                if int(item['po_no']) == pk:
-                    print('grompo', item["grn_line"], po.grn_no)    
+                if int(item['po_no']) == pk: 
                     if (item["grn_line"], po.grn_no) not in original_grn_line:
                         dict = {
                             "line_no": item["line_no"],
