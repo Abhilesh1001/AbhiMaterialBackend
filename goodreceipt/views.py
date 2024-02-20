@@ -131,7 +131,7 @@ class GRNView(APIView):
         serilizer =  GRNSerilizer(grn,data=request.data) 
         if serilizer.is_valid():
             serilizer.save()
-            return Response({'msg':'Data Updated Sussfully','data':serilizer.data},status=status.HTTP_200_OK)
+            return Response({'msg':'Data Updated Successfully','data':serilizer.data},status=status.HTTP_200_OK)
         return Response(serilizer.errors)
     
     
@@ -249,20 +249,42 @@ class MaterialIssueView(APIView):
 
     def get(self,request,pk=None,format=None):
         if pk is not None:
-            miro =  MIR.objects.get(mir_no=pk)
-            serillizer = MaterialIssueSerilizer(miro)
-            return (serillizer.data)
+            miro =  MaterialIssue.objects.get(issue_no=pk)
+            a=materilqty()
+            item_json = json.loads(miro.item_issue)
+            itemtype =[]
+            for item in item_json:
+                # print(item)
+                for items in a:
+                    # print(items,item)
+                    if items['material_no'] == item['material_no']:
+                        dict = {
+                            'mi_line': item['mi_line'], 
+                            'material_no': item['material_no'], 
+                            'material_name': item['material_name'],
+                            'material_unit': item['material_unit'],
+                            'material_qty': items['material_qty']+item['material_issue'],
+                            'material_issue': item['material_issue'],
+                            'material_remarks':item['material_remarks']
+                        }
+                        itemtype.append(dict)
+
+            missue = {"issue_no":miro.issue_no,'user':miro.user,'time':miro.time,'item_issue':json.dumps(itemtype),'remarks':miro.remarks}
+            serillizer = MaterialIssueSerilizer(missue)
+            return Response(serillizer.data)
         else:
-            miro = MIR.objects.all()
+            miro = MaterialIssue.objects.all()
             serillizer = MaterialIssueSerilizer(miro,many=True)
-            return (serillizer.data)
+            return Response(serillizer.data)
     
     def patch(self,request,pk=None,format=None):
-        miro = MIR.objects.get(mir_no=pk)
+        miro = MaterialIssue.objects.get(issue_no=pk)
         serilizer =  MaterialIssueSerilizer(miro,data=request.data)
         if serilizer.is_valid():
             serilizer.save()
-            return Response({'msg':'Data Updated Sussfully','data':serilizer.data},status=status.HTTP_200_OK)
+            print(serilizer.data)
+            return Response({'msg':'Data Updated Sucessfully','data':serilizer.data},status=status.HTTP_200_OK)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
 
             
 
@@ -322,10 +344,12 @@ class POinINRView(APIView):
         return Response(serializer.data)
    
 
-
+    
 
 def materilqty(pk=None):
     grn = GRN.objects.all()
+    missue = MaterialIssue.objects.all()
+    # print('missue',missue)
     orignal_material =  defaultdict(float)
     for item in grn:
         itemgrn = json.loads(item.item_po)
@@ -335,6 +359,15 @@ def materilqty(pk=None):
             material_unit = items['material_unit']
             orignal_material[material_no,material_name,material_unit] += float(items["material_qty"]) 
     # print(orignal_material)
+    for item in missue:
+        itemissue = json.loads(item.item_issue)
+        for items in itemissue:
+            material_no = int(items["material_no"])
+            material_name = items['material_name']
+            material_unit = items['material_unit']
+            orignal_material[material_no,material_name,material_unit] -= float(items["material_issue"])
+            
+
     list = []
     dict ={}
     if pk is not None:
