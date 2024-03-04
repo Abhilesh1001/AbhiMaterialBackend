@@ -226,7 +226,7 @@ class MiroView(APIView):
         else:
             miro = MIR.objects.all()
             serillizer = MiroSerilizer(miro,many=True)
-            return (serillizer.data)
+            return Response(serillizer.data)
     
     def patch(self,request,pk=None,format=None):
         miro = MIR.objects.get(mir_no=pk)
