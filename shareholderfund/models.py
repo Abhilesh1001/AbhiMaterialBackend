@@ -84,5 +84,23 @@ class LoanAmount(models.Model):
 
 
 
+class RDIntrest(models.Model):
+    rd_intrest_id = models.AutoField(primary_key=True)
+    person = models.ForeignKey(RdPerson, on_delete=models.CASCADE)
+    start_date = models.DateTimeField(blank=True, null=True)
+    closing_date = models.DateTimeField(blank=True, null=True)
+    is_active = models.BooleanField() 
+    duration = models.IntegerField()
+    interest_rate =  models.IntegerField()
+
+
+class RDCollectionNew(models.Model):
+    rd_intrest = models.ForeignKey(RDIntrest, on_delete=models.CASCADE, default=None)
+    collection_date = models.DateTimeField(default=now)
+    amount_collected = models.DecimalField(max_digits=10, decimal_places=2)
+    remarks = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+
+
 
 

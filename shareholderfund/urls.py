@@ -30,4 +30,10 @@ urlpatterns = [
     path('loanDataView',views.LoanDataAPIView.as_view()),
     path('loanamount',views.LaonAmountView.as_view()),
     path('loanamount/<int:pk>',views.LaonAmountView.as_view()),
+
+     #Rdintrest 
+    path('rdintrest',views.RDintrestView.as_view()),
+    path('rdintrest/<int:pk>',views.RDintrestView.as_view()),
+
+
 ]

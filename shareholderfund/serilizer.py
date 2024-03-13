@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ShareHolderFuns,ShareHolderName,RdPerson,RDCollection,LoanPerson,LoanCollection,LoanAmount
+from .models import ShareHolderFuns,ShareHolderName,RdPerson,RDCollection,LoanPerson,LoanCollection,LoanAmount,RDIntrest,RDCollectionNew
 
 class ShareHolderFunsSerilizer(serializers.ModelSerializer):
     class Meta:
@@ -89,3 +89,19 @@ class LoanCollectionSerilizerData(serializers.ModelSerializer):
     class Meta:
         model= LoanCollection
         fields =['id','person_id', 'person_name', 'amount_collected', 'remarks', 'collection_date']
+
+
+
+
+class RdIntersetSerilizer(serializers.ModelSerializer):
+    person_name= serializers.CharField(source='person.name')
+    person_id= serializers.IntegerField(source='person.rdp_id')
+    class Meta:
+        model = RDIntrest
+        fields =['rd_intrest_id' ,'person_name','person_id','start_date','closing_date','is_active','duration','interest_rate']
+
+    
+class RdIntersetOrignalSerilizer(serializers.ModelSerializer):
+    class Meta:
+        model = RDIntrest
+        fields = '__all__'

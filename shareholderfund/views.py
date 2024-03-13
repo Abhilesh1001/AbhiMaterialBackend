@@ -2,8 +2,8 @@ from django.shortcuts import render,HttpResponse
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from .serilizer import ShareHolderFunsSerilizer,ShareHolderNameSerilizer,SerilzerHOlderFund,RDCollectionSerializer,RDCollectionDataSerializer,PersonSerializer,LoanCollectionDataSerializer,LoanCollectionSerializer,LoanPersonSerializer,LaonaAmountSerilizer,ShareHolderFunsDataDisSerializer,RDCollectionSerializerData,LoanCollectionSerilizerData
-from .models import ShareHolderFuns,ShareHolderName,RdPerson,RDCollection,LoanCollection,LoanPerson,LoanAmount
+from .serilizer import ShareHolderFunsSerilizer,ShareHolderNameSerilizer,SerilzerHOlderFund,RDCollectionSerializer,RDCollectionDataSerializer,PersonSerializer,LoanCollectionDataSerializer,LoanCollectionSerializer,LoanPersonSerializer,LaonaAmountSerilizer,ShareHolderFunsDataDisSerializer,RDCollectionSerializerData,LoanCollectionSerilizerData,RdIntersetSerilizer,RdIntersetOrignalSerilizer
+from .models import ShareHolderFuns,ShareHolderName,RdPerson,RDCollection,LoanCollection,LoanPerson,LoanAmount,RDCollectionNew,RDIntrest
 from rest_framework.permissions import IsAuthenticated
 from cusauth.renderers import UserRenderer
 import json
@@ -461,4 +461,42 @@ class LaonAmountView(APIView):
         return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
 
     
+
+class RDintrestView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+
+    def post(self,request,format=None):
+        serilizer = RdIntersetOrignalSerilizer(data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'RD Intrest Created Successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+    def get(self,request,pk=None,format=None):
+        if pk is not None:
+            rdintrest = RDIntrest.objects.get(rd_intrest_id=pk) 
+            serilizer = RdIntersetSerilizer(rdintrest)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        else:
+            rdintrest =RDIntrest.objects.all()
+            serilizer = RdIntersetSerilizer(rdintrest,many=True)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        
+    def put(self,request,pk=None,format=None):
+        loan =  RDIntrest.objects.get(rd_intrest_id=pk)
+        serilizer = RdIntersetOrignalSerilizer(loan,data=request.data) 
+        if  serilizer.is_valid():
+            serilizer.save()
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self,request,pk=None,format=None):
+        loan =  RDIntrest.objects.get(rd_intrest_id=pk)
+        print(loan)
+        serilizer = RdIntersetOrignalSerilizer(loan,data=request.data) 
+        if  serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'RDIntrest Updated Successfully','data':serilizer.data},status=status.HTTP_200_OK)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
 
