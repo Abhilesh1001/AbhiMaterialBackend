@@ -2,7 +2,7 @@ from django.shortcuts import render,HttpResponse
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from .serilizer import ShareHolderFunsSerilizer,ShareHolderNameSerilizer,SerilzerHOlderFund,RDCollectionSerializer,RDCollectionDataSerializer,PersonSerializer,LoanCollectionDataSerializer,LoanCollectionSerializer,LoanPersonSerializer,LaonaAmountSerilizer,ShareHolderFunsDataDisSerializer,RDCollectionSerializerData,LoanCollectionSerilizerData,RdIntersetSerilizer,RdIntersetOrignalSerilizer
+from .serilizer import ShareHolderFunsSerilizer,ShareHolderNameSerilizer,SerilzerHOlderFund,RDCollectionSerializer,RDCollectionDataSerializer,PersonSerializer,LoanCollectionDataSerializer,LoanCollectionSerializer,LoanPersonSerializer,LaonaAmountSerilizer,ShareHolderFunsDataDisSerializer,RDCollectionSerializerData,LoanCollectionSerilizerData,RdIntersetSerilizer,RdIntersetOrignalSerilizer,RDColloectionNewSerilizer,RDCollectionNewDataSerializer,RDCollectionNewDataallSerializer
 from .models import ShareHolderFuns,ShareHolderName,RdPerson,RDCollection,LoanCollection,LoanPerson,LoanAmount,RDCollectionNew,RDIntrest
 from rest_framework.permissions import IsAuthenticated
 from cusauth.renderers import UserRenderer
@@ -186,7 +186,7 @@ class RDCollectionBulkCreateView(APIView):
         if pk is not None:
             rd_personcoll_data = RDCollection.objects.filter(person=pk)
             serializer = RDCollectionSerializerData(rd_personcoll_data, many=True)
-            
+
             return Response(serializer.data)
         else:
             rd = RDCollection.objects.all()
@@ -254,6 +254,7 @@ class RDDataAPIView(APIView):
     def post(self, request, *args, **kwargs):
         start_date = request.data.get('start_date')  # Format: 'YYYY-MM-DD'
         end_date = request.data.get('end_date')      # Format: 'YYYY-MM-DD'
+        print(start_date,end_date)
         start_date_aware = make_aware(datetime.strptime(start_date, '%Y-%m-%d'))
         end_date_aware = make_aware(datetime.strptime(end_date, '%Y-%m-%d'))
         print(start_date_aware, end_date_aware)
@@ -500,3 +501,120 @@ class RDintrestView(APIView):
             return Response({'msg':'RDIntrest Updated Successfully','data':serilizer.data},status=status.HTTP_200_OK)
         return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
 
+
+
+
+def merge_by_collection_date(queryset):
+        merged_data = {}
+        for item in queryset:
+            collection_date = item.collection_date.date()  # Extract date part
+            rd_intrest_id = item.rd_intrest.rd_intrest_id
+            if (collection_date, rd_intrest_id) not in merged_data:
+                merged_data[(collection_date, rd_intrest_id)] = item
+            else:
+                # If entry with same collection date and rd_intrest exists, add amount
+                merged_data[(collection_date, rd_intrest_id)].amount_collected +=item.amount_collected
+        return merged_data.values()
+
+
+class RDcollectionNewView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+
+    def post(self,request,format=None):
+        serilizer = RDColloectionNewSerilizer(data=request.data,many=True)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'RD Intrest Created Successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+    def get(self,request,pk=None,format=None):
+        if pk is not None:
+            rd_collections = RDCollectionNew.objects.filter(rd_intrest=pk)
+            merged_data = merge_by_collection_date(rd_collections)
+            serilizer = RDCollectionNewDataallSerializer(merged_data,many=True)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        else:   
+            rdintrest =RDCollectionNew.objects.all()
+            serilizer = RDColloectionNewSerilizer(rdintrest,many=True)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        
+    def put(self,request,pk=None,format=None):
+        loan =  RDCollectionNew.objects.get(rd_intrest_id=pk)
+        serilizer = RDColloectionNewSerilizer(loan,data=request.data) 
+        if  serilizer.is_valid():
+            serilizer.save()
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self,request,pk=None,format=None):
+        loan =  RDCollectionNew.objects.get(rd_intrest_id=pk)
+        serilizer = RDColloectionNewSerilizer(loan,data=request.data) 
+        if  serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'RDcollection Updated Successfully','data':serilizer.data},status=status.HTTP_200_OK)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+class RDDataNewAPIView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+    def post(self, request, *args, **kwargs):
+        start_date = request.data.get('start_date')  # Format: 'YYYY-MM-DD'
+        end_date = request.data.get('end_date')      # Format: 'YYYY-MM-DD'
+        start_date_aware = make_aware(datetime.strptime(start_date, '%Y-%m-%d'))
+        end_date_aware = make_aware(datetime.strptime(end_date, '%Y-%m-%d'))
+        print(start_date_aware, end_date_aware)
+        rd_collections = RDCollectionNew.objects.filter(collection_date__range=(start_date_aware, end_date_aware))
+        serializer = RDCollectionNewDataSerializer(rd_collections, many=True)
+
+        # print(serializer)
+        # Organize data as needed
+        organized_data = self.organize_data(serializer.data)
+
+        return Response(organized_data, status=status.HTTP_200_OK)
+
+    def organize_data(self, serialized_data):
+        # Implement logic to organize data as needed
+        # For example, create a dictionary with names as keys and lists of amounts as values
+
+        organized_data = {}
+
+        for item in serialized_data:
+            
+            rd_intrest = item.get('rd_intrest')
+            amount_collected = item['amount_collected']
+            collection_date = item['collection_date']
+            person_name =item['person_name']
+
+            if rd_intrest and amount_collected and collection_date:
+                
+                formatted_date = collection_date.split('T')[0]
+                key = f"{rd_intrest}_{person_name}" 
+                print(key)
+
+                if key not in organized_data:
+                    organized_data[key] = {}
+
+                if formatted_date not in organized_data[key]:
+                    organized_data[key][formatted_date] = 0
+
+                # Accumulate amounts for the same date and person
+                organized_data[key][formatted_date] += float(amount_collected)
+
+        return organized_data 
+    
+
+
+class OrignalRDcollectionNewView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+    # without adding collection amount 
+    def get(self,request,pk=None,format=None):
+        if pk is not None:
+            rdintrest = RDCollectionNew.objects.filter(rd_intrest=pk)
+            print(rdintrest)
+            serilizer = RDCollectionNewDataallSerializer(rdintrest,many=True)
+            return Response(serilizer.data,status=status.HTTP_200_OK)

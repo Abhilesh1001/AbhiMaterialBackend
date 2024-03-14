@@ -35,5 +35,9 @@ urlpatterns = [
     path('rdintrest',views.RDintrestView.as_view()),
     path('rdintrest/<int:pk>',views.RDintrestView.as_view()),
 
-
+    # RDcollectionNewserilizer 
+    path('rdcollectionnew',views.RDcollectionNewView.as_view()),
+    path('rdcollectionnew/<int:pk>',views.RDcollectionNewView.as_view()),
+    path('rdDataNewView',views.RDDataNewAPIView.as_view()),
+    path('orignalrdcollectionnew/<int:pk>',views.OrignalRDcollectionNewView.as_view()),
 ]

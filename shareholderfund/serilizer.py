@@ -105,3 +105,35 @@ class RdIntersetOrignalSerilizer(serializers.ModelSerializer):
     class Meta:
         model = RDIntrest
         fields = '__all__'
+
+
+class RDColloectionNewSerilizer(serializers.ModelSerializer):
+    class Meta:
+        model = RDCollectionNew
+        fields = '__all__'
+
+
+class RDCollectionNewDataSerializer(serializers.ModelSerializer):
+    person_name= serializers.CharField(source='rd_intrest.person.name')
+    person_id = serializers.IntegerField(source='rd_intrest.person.rdp_id')
+    class Meta:
+        model = RDCollectionNew
+        fields = ['rd_intrest','person_name','person_id','amount_collected','user','remarks','collection_date']
+
+
+
+class RDCollectionNewDataallSerializer(serializers.ModelSerializer):
+    person_name= serializers.CharField(source='rd_intrest.person.name')
+    person_id = serializers.IntegerField(source='rd_intrest.person.rdp_id')
+    duration= serializers.IntegerField(source='rd_intrest.duration')
+    interest = serializers.IntegerField(source='rd_intrest.interest_rate')
+    start_date = serializers.CharField(source='rd_intrest.start_date')
+    closing_date = serializers.CharField(source='rd_intrest.closing_date')
+    is_active = serializers.BooleanField(source='rd_intrest.is_active')
+    class Meta:
+        model = RDCollectionNew
+        fields = ['rd_intrest','person_name','duration','interest','is_active','start_date','closing_date','person_id','amount_collected','user','remarks','collection_date']
+
+
+
+

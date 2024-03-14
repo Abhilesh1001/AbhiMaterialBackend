@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ShareHolderName,ShareHolderFuns,RDCollection,RdPerson,LoanCollection,LoanPerson,LoanAmount
+from .models import ShareHolderName,ShareHolderFuns,RDCollection,RdPerson,LoanCollection,LoanPerson,LoanAmount,RDCollectionNew,RDIntrest
 
 # Register your models here.
 
@@ -33,4 +33,15 @@ class AdminLoanPerson(admin.ModelAdmin):
 @admin.register(LoanAmount)
 class AdminLoanAmount(admin.ModelAdmin):
     list_display = ['id' ,'loan_person','loan_amount','remarks','is_active','time','opening_date','closing_date']
+
+@admin.register(RDIntrest)
+class AdminRdintrest(admin.ModelAdmin):
+    list_display = ['rd_intrest_id','person','start_date','closing_date','is_active','duration','interest_rate']
+    
+@admin.register(RDCollectionNew)
+class AdminRdcollectionNew(admin.ModelAdmin):
+    list_display = ['rd_intrest','collection_date','amount_collected','remarks','user']
+
+
+
 
