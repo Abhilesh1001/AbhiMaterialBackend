@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ShareHolderFuns,ShareHolderName,RdPerson,RDCollection,LoanPerson,LoanCollection,LoanAmount,RDIntrest,RDCollectionNew
+from .models import ShareHolderFuns,ShareHolderName,RdPerson,RDCollection,LoanPerson,LoanCollection,LoanAmount,RDIntrest,RDCollectionNew,LoanCollectionNew
 
 class ShareHolderFunsSerilizer(serializers.ModelSerializer):
     class Meta:
@@ -135,5 +135,38 @@ class RDCollectionNewDataallSerializer(serializers.ModelSerializer):
         fields = ['rd_intrest','person_name','duration','interest','is_active','start_date','closing_date','person_id','amount_collected','user','remarks','collection_date']
 
 
+    
+class LaonaAmountIntrestSerilizer(serializers.ModelSerializer):
+    person_id = serializers.IntegerField(source='loan_person.loan_id')
+    person_name = serializers.CharField(source='loan_person.name')
+    class Meta:
+        model = LoanAmount
+        fields = ['id','person_id','person_name','closing_date','duration','interest_rate','is_active','loan_amount','loan_person','opening_date','remarks','start_date','time','user']
 
 
+class LoanCollectionNewSerilizer(serializers.ModelSerializer):
+    class Meta:
+        models = LoanCollectionNew
+        fields = '__all__'
+
+
+class LoanCollectionNewDataallSerializer(serializers.ModelSerializer):
+    person_name= serializers.CharField(source='loan_intrest.loan_person.name')
+    person_id = serializers.IntegerField(source='loan_intrest.loan_person.loan_id')
+    loan_amount = serializers.IntegerField(source='loan_intrest.loan_amount')
+    is_active = serializers.BooleanField(source='loan_intrest.is_active')
+    duration= serializers.IntegerField(source='loan_intrest.duration')
+    start_date = serializers.CharField(source='loan_intrest.start_date')
+    closing_date = serializers.CharField(source='loan_intrest.closing_date')
+    interest = serializers.IntegerField(source='loan_intrest.interest_rate')
+    class Meta:
+        model = LoanCollectionNew
+        fields = ['person_name','person_id','loan_amount','is_active','duration','start_date','closing_date','interest','loan_intrest','collection_date','amount_collected','remarks']
+
+
+class LoanCollectionNewDataSerializer(serializers.ModelSerializer):
+    person_name= serializers.CharField(source='loan_intrest.loan_person.name')
+    person_id = serializers.IntegerField(source='loan_intrest.loan_person.loan_id')
+    class Meta:
+        model = LoanCollectionNew
+        fields = ['person_name','person_id','loan_intrest','collection_date','amount_collected','remarks','user']

@@ -40,4 +40,11 @@ urlpatterns = [
     path('rdcollectionnew/<int:pk>',views.RDcollectionNewView.as_view()),
     path('rdDataNewView',views.RDDataNewAPIView.as_view()),
     path('orignalrdcollectionnew/<int:pk>',views.OrignalRDcollectionNewView.as_view()),
+
+    # loancollectionNewSerillizer
+    path('loancollectionnew',views.LoanCollectionNewView.as_view()),
+    path('loancollectionnew/<int:pk>',views.LoanCollectionNewView.as_view()),
+    path('loanDataNewView',views.LoanDataNewAPIView.as_view()),
+    path('orignalloancollectionnew/<int:pk>',views.OrignalLoancollectionNewView.as_view()),
+
 ]

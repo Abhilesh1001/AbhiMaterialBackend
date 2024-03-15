@@ -2,8 +2,8 @@ from django.shortcuts import render,HttpResponse
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from .serilizer import ShareHolderFunsSerilizer,ShareHolderNameSerilizer,SerilzerHOlderFund,RDCollectionSerializer,RDCollectionDataSerializer,PersonSerializer,LoanCollectionDataSerializer,LoanCollectionSerializer,LoanPersonSerializer,LaonaAmountSerilizer,ShareHolderFunsDataDisSerializer,RDCollectionSerializerData,LoanCollectionSerilizerData,RdIntersetSerilizer,RdIntersetOrignalSerilizer,RDColloectionNewSerilizer,RDCollectionNewDataSerializer,RDCollectionNewDataallSerializer
-from .models import ShareHolderFuns,ShareHolderName,RdPerson,RDCollection,LoanCollection,LoanPerson,LoanAmount,RDCollectionNew,RDIntrest
+from .serilizer import ShareHolderFunsSerilizer,ShareHolderNameSerilizer,SerilzerHOlderFund,RDCollectionSerializer,RDCollectionDataSerializer,PersonSerializer,LoanCollectionDataSerializer,LoanCollectionSerializer,LoanPersonSerializer,LaonaAmountSerilizer,ShareHolderFunsDataDisSerializer,RDCollectionSerializerData,LoanCollectionSerilizerData,RdIntersetSerilizer,RdIntersetOrignalSerilizer,RDColloectionNewSerilizer,RDCollectionNewDataSerializer,RDCollectionNewDataallSerializer,LaonaAmountIntrestSerilizer,LoanCollectionNewSerilizer,LoanCollectionNewDataallSerializer,LoanCollectionNewDataSerializer
+from .models import ShareHolderFuns,ShareHolderName,RdPerson,RDCollection,LoanCollection,LoanPerson,LoanAmount,RDCollectionNew,RDIntrest,LoanCollectionNew
 from rest_framework.permissions import IsAuthenticated
 from cusauth.renderers import UserRenderer
 import json
@@ -438,7 +438,7 @@ class LaonAmountView(APIView):
     def get(self,request,pk=None,format=None):
         if pk is not None:
             loan = LoanAmount.objects.get(pk=pk) 
-            serilizer =  LaonaAmountSerilizer(loan)
+            serilizer =  LaonaAmountIntrestSerilizer(loan)
             return Response(serilizer.data,status=status.HTTP_200_OK)
         else:
             loan =LoanAmount.objects.all()
@@ -450,7 +450,7 @@ class LaonAmountView(APIView):
         serilizer = LaonaAmountSerilizer(loan,data=request.data) 
         if  serilizer.is_valid():
             serilizer.save()
-            return Response(serilizer.data,status=status.HTTP_200_OK)
+            return Response(serilizer.data,status=status.HTTP_200_OK)       
         return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self,request,pk=None,format=None):
@@ -458,7 +458,7 @@ class LaonAmountView(APIView):
         serilizer = LaonaAmountSerilizer(loan,data=request.data) 
         if  serilizer.is_valid():
             serilizer.save()
-            return Response(serilizer.data,status=status.HTTP_200_OK)
+            return Response({'msg':'Loan Updated Successfully','data':serilizer.data},status=status.HTTP_200_OK)
         return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
 
     
@@ -618,3 +618,128 @@ class OrignalRDcollectionNewView(APIView):
             print(rdintrest)
             serilizer = RDCollectionNewDataallSerializer(rdintrest,many=True)
             return Response(serilizer.data,status=status.HTTP_200_OK)
+
+
+
+def merge_by_collection_date_Loan(queryset):
+    merged_data = {}
+    for item in queryset:
+        collection_date = item.collection_date.date()  # Extract date part
+        loan_intrest_id = item.loan_intrest.id
+        if (collection_date, loan_intrest_id) not in merged_data:
+            # If entry with same collection date and loan interest does not exist, add it
+            merged_data[(collection_date, loan_intrest_id)] = {
+                'item': item,
+                'total_amount_collected': item.amount_collected
+            }
+        else:
+            # If entry with same collection date and loan interest exists, add amount
+            merged_data[(collection_date, loan_intrest_id)]['total_amount_collected'] += item.amount_collected
+    
+    # Now, extract values from merged_data
+    merged_values = [entry['item'] for entry in merged_data.values()]
+    return merged_values
+
+
+class LoanCollectionNewView(APIView):
+    renderer_classes =[UserRenderer]
+    permission_classes=[IsAuthenticated]
+    def post(self,request,format=None):
+        serilizer = LoanCollectionNewSerilizer(data=request.data,many=True)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'RD Intrest Created Successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+    def get(self,request,pk=None,format=None):
+        if pk is not None:
+            loan_collections = LoanCollectionNew.objects.filter(loan_intrest=pk)
+            merged_data = merge_by_collection_date_Loan(loan_collections)
+            serilizer = LoanCollectionNewDataallSerializer(merged_data,many=True)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        else:   
+            rdintrest =LoanCollectionNew.objects.all()
+            serilizer = LoanCollectionNewSerilizer(rdintrest,many=True)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+    
+    def put(self,request,pk=None,format=None):
+        loan =  LoanCollectionNew.objects.get(id=pk)
+        serilizer = LoanCollectionNewSerilizer(loan,data=request.data) 
+        if  serilizer.is_valid():
+            serilizer.save()
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self,request,pk=None,format=None):
+        loan =  LoanCollectionNew.objects.get(id=pk)
+        serilizer = LoanCollectionNewSerilizer(loan,data=request.data) 
+        if  serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'Loancollection Updated Successfully','data':serilizer.data},status=status.HTTP_200_OK)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST) 
+    
+
+
+class LoanDataNewAPIView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+    def post(self, request, *args, **kwargs):
+        start_date = request.data.get('start_date')  # Format: 'YYYY-MM-DD'
+        end_date = request.data.get('end_date')      # Format: 'YYYY-MM-DD'
+        start_date_aware = make_aware(datetime.strptime(start_date, '%Y-%m-%d'))
+        end_date_aware = make_aware(datetime.strptime(end_date, '%Y-%m-%d'))
+        print(start_date_aware, end_date_aware)
+        loan_collections = LoanCollectionNew.objects.filter(collection_date__range=(start_date_aware, end_date_aware))
+        serializer = LoanCollectionNewDataSerializer(loan_collections, many=True)
+
+        # print(serializer)
+        # Organize data as needed
+        organized_data = self.organize_data(serializer.data)
+
+        return Response(organized_data, status=status.HTTP_200_OK)
+
+    def organize_data(self, serialized_data):
+        # Implement logic to organize data as needed
+        # For example, create a dictionary with names as keys and lists of amounts as values
+
+        organized_data = {}
+
+        for item in serialized_data:
+            
+            loan_intrest = item.get('loan_intrest')
+            amount_collected = item['amount_collected']
+            collection_date = item['collection_date']
+            person_name =item['person_name']
+
+            if loan_intrest and amount_collected and collection_date:
+                
+                formatted_date = collection_date.split('T')[0]
+                key = f"{loan_intrest}_{person_name}" 
+                print(key)
+
+                if key not in organized_data:
+                    organized_data[key] = {}
+
+                if formatted_date not in organized_data[key]:
+                    organized_data[key][formatted_date] = 0
+
+                # Accumulate amounts for the same date and person
+                organized_data[key][formatted_date] += float(amount_collected)
+
+        return organized_data 
+  
+
+class OrignalLoancollectionNewView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+    # without adding collection amount 
+    def get(self,request,pk=None,format=None):
+        if pk is not None:
+            loanintrest = RDCollectionNew.objects.filter(loan_intrest=pk)
+            print(loanintrest)
+            serilizer = LoanCollectionNewDataallSerializer(loanintrest,many=True)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+
+
+
+            
+

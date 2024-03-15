@@ -74,7 +74,10 @@ class LoanAmount(models.Model):
     is_active = models.BooleanField()
     time = models.DateTimeField(default = now)
     opening_date = models.DateTimeField(default=now)
+    start_date = models.DateTimeField(blank=True, null=True)
+    duration = models.IntegerField(default=0)
     closing_date = models.DateTimeField(blank=True, null=True)
+    interest_rate =  models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
         if not self.pk:  # This check ensures that it's a new loan (creation).
@@ -102,5 +105,10 @@ class RDCollectionNew(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
 
 
-
-
+ 
+class LoanCollectionNew(models.Model): 
+    loan_intrest = models.ForeignKey(LoanAmount, on_delete=models.CASCADE) 
+    collection_date = models.DateTimeField(default = now)
+    amount_collected = models.DecimalField(max_digits=10, decimal_places=2)
+    remarks = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(User,on_delete=models.CASCADE) 
