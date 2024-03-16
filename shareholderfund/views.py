@@ -442,7 +442,7 @@ class LaonAmountView(APIView):
             return Response(serilizer.data,status=status.HTTP_200_OK)
         else:
             loan =LoanAmount.objects.all()
-            serilizer = LaonaAmountSerilizer(loan,many=True)
+            serilizer = LaonaAmountIntrestSerilizer(loan,many=True)
             return Response(serilizer.data,status=status.HTTP_200_OK)
     
     def put(self,request,pk=None,format=None):
@@ -624,21 +624,19 @@ class OrignalRDcollectionNewView(APIView):
 def merge_by_collection_date_Loan(queryset):
     merged_data = {}
     for item in queryset:
+        
+        print(item.collection_date)
         collection_date = item.collection_date.date()  # Extract date part
         loan_intrest_id = item.loan_intrest.id
+
         if (collection_date, loan_intrest_id) not in merged_data:
             # If entry with same collection date and loan interest does not exist, add it
-            merged_data[(collection_date, loan_intrest_id)] = {
-                'item': item,
-                'total_amount_collected': item.amount_collected
-            }
+            merged_data[(collection_date, loan_intrest_id)] = item
         else:
             # If entry with same collection date and loan interest exists, add amount
-            merged_data[(collection_date, loan_intrest_id)]['total_amount_collected'] += item.amount_collected
+            merged_data[(collection_date, loan_intrest_id)].amount_collected += item.amount_collected
     
-    # Now, extract values from merged_data
-    merged_values = [entry['item'] for entry in merged_data.values()]
-    return merged_values
+    return merged_data.values()
 
 
 class LoanCollectionNewView(APIView):
@@ -648,7 +646,7 @@ class LoanCollectionNewView(APIView):
         serilizer = LoanCollectionNewSerilizer(data=request.data,many=True)
         if serilizer.is_valid():
             serilizer.save()
-            return Response({'msg':'RD Intrest Created Successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
+            return Response({'msg':'Loan Intrest Created Successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
         return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
     def get(self,request,pk=None,format=None):
         if pk is not None:

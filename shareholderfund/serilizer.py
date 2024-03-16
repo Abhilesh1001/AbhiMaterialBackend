@@ -146,7 +146,7 @@ class LaonaAmountIntrestSerilizer(serializers.ModelSerializer):
 
 class LoanCollectionNewSerilizer(serializers.ModelSerializer):
     class Meta:
-        models = LoanCollectionNew
+        model = LoanCollectionNew
         fields = '__all__'
 
 
