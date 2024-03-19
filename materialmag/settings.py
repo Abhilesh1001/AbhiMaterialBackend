@@ -36,7 +36,8 @@ INSTALLED_APPS = [
     'material',
     'rest_framework_simplejwt',
     'goodreceipt',
-    'shareholderfund'
+    'shareholderfund',
+    'shlord'
 ]
 
 MIDDLEWARE = [

@@ -114,7 +114,7 @@ class RDColloectionNewSerilizer(serializers.ModelSerializer):
 
 
 class RDCollectionNewDataSerializer(serializers.ModelSerializer):
-    person_name= serializers.CharField(source='rd_intrest.person.name')
+    person_name= serializers.CharField(source='rd_interest.person.name')
     person_id = serializers.IntegerField(source='rd_intrest.person.rdp_id')
     class Meta:
         model = RDCollectionNew

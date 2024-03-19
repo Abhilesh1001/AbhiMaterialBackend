@@ -9,7 +9,8 @@ urlpatterns = [
     path('cus/',include('cusauth.urls')),
     path('mat/',include('material.urls')),
     path('grn/',include('goodreceipt.urls')),
-    path('shar/',include('shareholderfund.urls'))
+    path('shar/',include('shareholderfund.urls')),
+    path('loan/',include('shlord.urls'))
 ]
 if settings.DEBUG:
     urlpatterns +=static(settings.MEDIA_URL,document_root = settings.MEDIA_ROOT)

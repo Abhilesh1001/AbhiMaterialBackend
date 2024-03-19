@@ -4,6 +4,7 @@ from django.utils.timezone import now
 
 # Create your models here.
 
+
 class ShareHolderName(models.Model):
     Sh_id = models.AutoField(primary_key=True)
     name= models.CharField(max_length=100)
@@ -37,6 +38,8 @@ class RdPerson(models.Model):
 
 
 
+
+# not in use 
 class RDCollection(models.Model):
     person = models.ForeignKey(RdPerson, on_delete=models.CASCADE)
     collection_date = models.DateTimeField(default = now)
@@ -112,3 +115,4 @@ class LoanCollectionNew(models.Model):
     amount_collected = models.DecimalField(max_digits=10, decimal_places=2)
     remarks = models.TextField(blank=True, null=True)
     user = models.ForeignKey(User,on_delete=models.CASCADE) 
+

@@ -9,7 +9,6 @@ from cusauth.renderers import UserRenderer
 import json
 
 
-
 # Create your views here.
 def index(request):
     return HttpResponse('ok')
@@ -333,7 +332,8 @@ class LoanCollectionBulkCreateView(APIView):
             serilizer.save()
             return Response(serilizer.data)
         
-           
+
+       
 class LoanName(APIView):
     renderer_classes = [UserRenderer]
     permission_classes = [IsAuthenticated]
@@ -736,8 +736,4 @@ class OrignalLoancollectionNewView(APIView):
             print(loanintrest)
             serilizer = LoanCollectionNewDataallSerializer(loanintrest,many=True)
             return Response(serilizer.data,status=status.HTTP_200_OK)
-
-
-
-            
 
