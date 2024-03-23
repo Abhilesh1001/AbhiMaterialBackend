@@ -690,3 +690,5 @@ class OrPuchaseOrderView(APIView):
              po = PurchaseOrder.objects.all()
              serilizer = PurchaseOrderSerilizer(po,many=True)
              return Response(serilizer.data,status=status.HTTP_200_OK) 
+        
+

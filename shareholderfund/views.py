@@ -168,7 +168,7 @@ class CapitalDisclouserview(APIView):
         return Response(serilizer.data,status=status.HTTP_200_OK)
     
 
-
+# not in use 
 class RDCollectionBulkCreateView(APIView):
     renderer_classes = [UserRenderer]
     permission_classes = [IsAuthenticated]
@@ -296,7 +296,7 @@ class RDDataAPIView(APIView):
 
 
 # Loan Collection DAta 
-
+# Not in use 
 class LoanCollectionBulkCreateView(APIView):
     renderer_classes = [UserRenderer]
     permission_classes = [IsAuthenticated]
