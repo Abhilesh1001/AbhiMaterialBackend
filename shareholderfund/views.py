@@ -737,3 +737,7 @@ class OrignalLoancollectionNewView(APIView):
             serilizer = LoanCollectionNewDataallSerializer(loanintrest,many=True)
             return Response(serilizer.data,status=status.HTTP_200_OK)
 
+
+
+
+

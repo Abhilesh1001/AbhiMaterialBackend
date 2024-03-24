@@ -116,3 +116,7 @@ class LoanCollectionDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = LoanColl
         fields = ['person_name','person_id','loan_intrest','collection_date','amount_collected','remarks','usersf']
+
+
+
+

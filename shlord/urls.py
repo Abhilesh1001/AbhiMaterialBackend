@@ -32,4 +32,9 @@ urlpatterns = [
     path('loancollection/<int:pk>',views.LoanCollectionView.as_view()),
     path('loanDataView',views.LoanDataAPIView.as_view()),
 
+    path('cashflow',views.CashFlowStatement.as_view()),
+
+
+
+ 
 ]

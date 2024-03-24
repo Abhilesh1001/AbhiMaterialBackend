@@ -472,3 +472,166 @@ class LoanDataAPIView(APIView):
 
         return organized_data 
   
+
+
+
+
+
+from django.db.models import Sum
+
+def collection_summary():
+    collection_dates = LoanColl.objects.values('collection_date').annotate(total_amount=Sum('amount_collected'))
+    summary_dict = {item['collection_date'].strftime('%Y-%m-%d'): float(item['total_amount']) for item in collection_dates}
+
+    return summary_dict
+
+
+def collection_summary_RD():
+    collection_dates = RDColl.objects.values('collection_date').annotate(total_amount=Sum('amount_collected'))
+    summary_dict = {item['collection_date'].strftime('%Y-%m-%d'): float(item['total_amount']) for item in collection_dates}
+
+    
+    
+    return summary_dict
+   
+
+def collection_summary_loanDistribute():
+    loan = LoanInt.objects.values()
+    summary_dict = {}
+
+    for item in loan:
+        start_date = item['start_date'].strftime('%Y-%m-%d')
+        loan_id = item['loan_id']
+        person = Person.objects.get(person_id=item['person_id'])
+
+        # person_name = Person.objects.get(person_id=item[''])
+        key = f'{start_date}_loan_{loan_id}'  # Create a unique key combining start_date and loan_id
+        
+        # Check if the key already exists in the summary_dict, if not, initialize it with an empty list
+        if key not in summary_dict:
+            summary_dict[key] = []
+        
+        summary_dict[key].append({"loan_amount": float(item['loan_amount']), "loan_id": loan_id,'name':person.name})
+
+   
+
+    return summary_dict
+
+    
+
+def collection_summary_fundcreditdistribute():
+    sharehol = ShareHolder.objects.values()
+    
+    summary_dict = {}
+
+    for item in sharehol:
+        start_date = item['collection_date'].strftime('%Y-%m-%d')
+        sfh_id = item['shf_id']
+        person_name = Person.objects.get(person_id=item['person_id'])
+
+        key = f'{start_date}_share_{sfh_id}'  # C reate a unique key combining start_date and loan_id
+        
+        # Check if the key already exists in the summary_dict, if not, initialize it with an empty list
+        if key not in summary_dict:
+            summary_dict[key] = []
+        
+        summary_dict[key].append({"amount_credit": float(item['amount_credit']),"amount_Debit": float(item['amount_Debit']), "shf_id": sfh_id,'name':person_name.name,'person_id':item['person_id']})
+
+  
+    return summary_dict
+
+
+
+class CashFlowStatement(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+    def get(self,request,pk=None,format=None):
+        
+        RDCollection = collection_summary_RD()
+        loan_collectopn = collection_summary()
+
+        loancoll_date = collection_summary_loanDistribute()
+
+        shf = collection_summary_fundcreditdistribute()
+        
+        dict_rd = []
+        for key,value in RDCollection.items():
+            dictnew = {
+                f'{key}_rdcoll' : value,
+            }
+            dict_rd.append(dictnew)
+        
+        dict_loan =[]
+        for key,value in loan_collectopn.items():
+            dictnew = {
+                f'{key}_loancoll' : value,
+            }
+            dict_loan.append(dictnew)
+        
+
+        data = {"data":[dict_rd,dict_loan,shf,loancoll_date]}
+   
+        print('...')
+
+        
+
+        orignalData = self.datamodify(data)     
+        # print(data)          
+            # new data 
+                
+
+        return Response(orignalData)
+    def datamodify(self,data):
+        # print('.....',data)
+        # print(data['data'][0],'datazero',data['data'][1],data['data'][2],data['data'][3])
+        newdata = []
+        for item in data['data'][0]:
+            # print(item)
+            newdata.append(item)
+        
+        for item in data['data'][1]:
+            # print(item)
+            newdata.append(item)
+
+        newDatanew = data['data'][2]
+        # print(newDatanew,'..........')
+
+        for key, value in newDatanew.items():
+            # print(key)
+            for item in value:
+                # print(item)
+                dict = {key:item}
+                newdata.append(dict)
+
+        newDatanewnew = data['data'][3]
+       
+        for key, value in newDatanewnew.items():
+            # print(key)
+            for item in value:
+                # print(item)
+                dict = {key:item}
+                newdata.append(dict)
+
+
+
+        requiredata = []
+        sorted_data = sorted(newdata, key=lambda x: list(x.keys())[0])
+        for item in sorted_data:
+            for key, value in item.items():
+                print(key,value)
+                dict =  {
+                    key :value 
+                }
+                requiredata.append(dict)
+
+                
+
+        return requiredata
+
+
+
+
+
+
+
+
