@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import PaymentTovendor,AdvancePayment
-
+from goodreceipt.models import MIR
 
 class AdvancePaymentsErilizer(serializers.ModelSerializer):
     class Meta:
@@ -34,3 +34,10 @@ class PaymentSerilizerAll(serializers.ModelSerializer):
         fields = ['payment_no','amount_debit','user','time','item_grn','vendor_name','bill_no','main_data','miro_no','advance_adjust']
 
 
+
+
+class MiroSerilizer(serializers.ModelSerializer):
+    
+    class Meta:
+        model= MIR
+        fields = '__all__'

@@ -13,5 +13,7 @@ urlpatterns = [
     path('payment', views.PaymaentView.as_view()),
     path('payment/<int:pk>/', views.PaymaentView.as_view()),
 
-    path('paymnetbymiro',views.PaymentFilterByMiro.as_view())
+    path('paymnetbymiro',views.PaymentFilterByMiro.as_view()),
+    path('mirocreateview/<int:pk>/',views.MiroPaymentView.as_view()),
+    path('paymentupdateview/<int:pk>/',views.PaymentUpdateView.as_view()),
 ]

@@ -4,11 +4,11 @@ from .models import PaymentTovendor,AdvancePayment
 
 
 @admin.register(PaymentTovendor)
-class AdminMaterilaGroup(admin.ModelAdmin):
+class AdminPaymenttoVEndor(admin.ModelAdmin):
     list_display=['payment_no','miro_no','amount_debit','user','time','advance_adjust']
 
 @admin.register(AdvancePayment)
-class AdminMaterilaUnit(admin.ModelAdmin):
+class AdminAdvancePayment(admin.ModelAdmin):
     list_display=['advance_payment_no','po_no','amount_debit','user','time']
 
 
