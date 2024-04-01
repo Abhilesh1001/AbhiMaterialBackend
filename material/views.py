@@ -8,7 +8,7 @@ from .serlilizer import MaterialSerlizer,PurchaseRequestSerializer,VendorSEriliz
 from rest_framework.response import Response
 from rest_framework import status 
 import json
-from collections import defaultdict
+from collections import defaultdict 
 from goodreceipt.models import GRN
 
 
@@ -692,3 +692,17 @@ class OrPuchaseOrderView(APIView):
              return Response(serilizer.data,status=status.HTTP_200_OK) 
         
 
+
+class PurchaseOrderAdvance(APIView):
+
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+    def get(self,requiest,pk=None,format=None):
+        if pk is not None:
+            po = PurchaseOrder.objects.get(po_no=pk)
+            serilizer = PurchaseOrderSerilizer(po)
+            return Response(serilizer.data,status=status.HTTP_200_OK) 
+        else: 
+             po = PurchaseOrder.objects.all()
+             serilizer = PurchaseOrderSerilizer(po,many=True)
+             return Response(serilizer.data,status=status.HTTP_200_OK) 

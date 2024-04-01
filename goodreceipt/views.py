@@ -91,7 +91,6 @@ class GRNPermission(BasePermission):
         if not has_all_permissions:
             print(f'User does not have all required permissions: {required_permissions}')
 
-
         return has_all_permissions
 
 
@@ -409,3 +408,6 @@ class MaterilStock(APIView):
         else:
             materialStock =  materilqty()
             return Response(materialStock)
+
+
+

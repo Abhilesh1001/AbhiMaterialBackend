@@ -12,8 +12,6 @@ class Material(models.Model):
     user = models.ForeignKey(User,on_delete = models.CASCADE)
     time = models.DateTimeField(default = now)
 
-
-
 #Absoulte 
 class PurchaseRequest(models.Model):
     s_no = models.AutoField(primary_key=True)
@@ -60,3 +58,18 @@ class PurchaseOrder(models.Model):
     vendor_address = models.CharField(max_length=100000,default='')
     delivery_address = models.CharField(max_length=100000,default='')
     maindata = models.CharField(max_length=10000,default='')
+
+
+
+class MaterialGroup(models.Model):
+    group_no =  models.AutoField(primary_key=True)
+    group_name = models.CharField(max_length=40,default='')
+
+
+class MaterialUnit(models.Model):
+    unit_no = models.AutoField(primary_key=True)
+    material_umit = models.CharField(max_length=40,default='')
+
+
+
+
