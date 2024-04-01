@@ -107,6 +107,7 @@ from collections import defaultdict
 
 class PaymentFilterByMiro(APIView):
     renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
     def get(self,request,pk=None,format=None):
         if pk is not None:
             
@@ -142,6 +143,8 @@ class PaymentFilterByMiro(APIView):
             return Response(newDict,status=status.HTTP_200_OK)
 
 class MiroPaymentView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
     def get(self,request,pk=None,format=None):
         paymenttovendor = MIR.objects.filter(mir_no=pk)
         paymettovendor = PaymentTovendor.objects.filter(miro_no=pk)
@@ -175,6 +178,8 @@ class MiroPaymentView(APIView):
 
 
 class PaymentUpdateView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
     def get(self,request,pk=None,format=None):
         paymettovendor = PaymentTovendor.objects.get(payment_no=pk)
         miro_no = paymettovendor.miro_no.mir_no
