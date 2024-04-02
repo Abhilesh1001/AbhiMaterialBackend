@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from cusauth.renderers import UserRenderer
 import json
 from goodreceipt.models import MIR
+from decimal import Decimal
 
 # Create your views here.
 def index(request):
@@ -147,8 +148,9 @@ class MiroPaymentView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self,request,pk=None,format=None):
         paymenttovendor = MIR.objects.filter(mir_no=pk)
+
         paymettovendor = PaymentTovendor.objects.filter(miro_no=pk)
-        total_advance = 0
+        total_advance = Decimal(0)
         for item in paymenttovendor:
             json_data = json.loads(item.item_grn)
             po_no = json_data[0]['po_no']
@@ -156,7 +158,7 @@ class MiroPaymentView(APIView):
             for items in total_advance_payment:
                 total_advance+=items.amount_debit 
             break
-        totaladvanceadjust = 0
+        totaladvanceadjust = Decimal(0)
         for items in paymettovendor:
             print(items)
             totaladvanceadjust += items.advance_adjust 
@@ -166,11 +168,14 @@ class MiroPaymentView(APIView):
         serilizer = MiroSerilizer(miro)  
 
 
-        total_paymant =0 
+        total_paymant = Decimal(0) 
         payment =  PaymentTovendor.objects.filter(miro_no=pk)
         for item in payment:
             print(item.amount_debit)
             total_paymant +=item.amount_debit + item.advance_adjust
+        
+        balance_amount = float(balance_amount)
+        total_paymant = float(total_paymant)
         
         return Response({'data':serilizer.data,"total_advance_balance":balance_amount,'total_paymet':total_paymant  })
     
@@ -187,7 +192,7 @@ class PaymentUpdateView(APIView):
         paymenttovendor = MIR.objects.filter(mir_no=miro_no)
         print(paymenttovendor,'.........')
 
-        total_advance = 0
+        total_advance = Decimal(0)
         for item in paymenttovendor:
             json_data = json.loads(item.item_grn)
             po_no = json_data[0]['po_no']
@@ -195,7 +200,7 @@ class PaymentUpdateView(APIView):
             for items in total_advance_payment:
                 total_advance+=items.amount_debit 
             break
-        totaladvanceadjust = 0
+        totaladvanceadjust = Decimal(0)
 
         allpayvendormrn = PaymentTovendor.objects.filter(miro_no=miro_no)
 
@@ -208,12 +213,16 @@ class PaymentUpdateView(APIView):
         miro = MIR.objects.get(mir_no=miro_no)
         serilizer = MiroSerilizer(miro)  
 
-        total_paymant =0 
+        total_paymant = Decimal(0) 
 
         payment =  PaymentTovendor.objects.filter(miro_no=miro_no) 
         for item in payment:
             print(item.amount_debit)
             total_paymant +=item.amount_debit + item.advance_adjust
+
+
+        balance_amount =  float(balance_amount)
+        total_paymant = float(total_paymant)
 
         newata  = {'data':serilizer.data,"total_advance_balance":balance_amount,'total_paymet':total_paymant  }
         
