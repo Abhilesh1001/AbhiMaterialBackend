@@ -152,7 +152,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://materialmovement.vercel.app",
     "https://procurement-mu.vercel.app",
-    "https://sharerdloan.vercel.app"
+    "https://sharerdloan.vercel.app",
+    "https://sharerloanrdcollection.vercel.app"
 ]
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=20),

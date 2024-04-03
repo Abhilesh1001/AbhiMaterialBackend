@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from cusauth.renderers import UserRenderer
 from .serilizer import PersonSerilizer,ShareHolderFunsSerilizer,ShareHolderFunsDataDisSerializer,SerilzerHOlderFund,RdIntersetOrignalSerilizer,RdIntersetSerilizer,RDColloectionSerilizer,RDCollectionDataallSerializer,RDCollectionDataSerializer,LaonaAmountSerilizer,LaonaAmountIntrestSerilizer,LoanCollectionSerilizer,LoanCollectionDataallSerializer,LoanCollectionDataSerializer
-from .models import Person,LoanInt,LoanColl,ShareHolder,RDColl,RDInt
+from .models import Person,LoanInt,LoanColl,ShareHolder,RDColl,RDInt,StaffSalary,Partuclars
 from collections import defaultdict
 from django.utils.timezone import make_aware
 from datetime import datetime
@@ -24,7 +24,7 @@ class MemberView(APIView):
         serilizer = PersonSerilizer(data=request.data)
         if serilizer.is_valid():
             serilizer.save()
-            return Response({'msg':'Member Added successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
+            return Response({'msg':'Customer Added successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
         else:
             return Response(serilizer.errors)
         
@@ -32,7 +32,7 @@ class MemberView(APIView):
     def get(self,request,pk=None,format=None):
 
         if pk is not None:
-            sh = Person.objects.get(Sh_id=pk)
+            sh = Person.objects.get(person_id=pk)
             serilizer =  PersonSerilizer(sh)
             return Response(serilizer.data,status=status.HTTP_200_OK)
         else:
@@ -41,7 +41,7 @@ class MemberView(APIView):
             return Response(serilizer.data,status=status.HTTP_200_OK)
         
     def put(self,request,pk=None,format=None):
-        sh = Person.objects.get(Sh_id=pk)
+        sh = Person.objects.get(person_id=pk)
         serilizer = PersonSerilizer(sh,data=request.data)
         if  serilizer.is_valid():
             serilizer.save()
@@ -49,16 +49,16 @@ class MemberView(APIView):
         return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
         
     def patch(self,request,pk=None,format=None):
-        sh = PersonSerilizer.objects.get(Sh_id=pk)
+        sh = Person.objects.get(person_id=pk)
         print(sh)
         serilizer = PersonSerilizer(sh,data=request.data)
         if  serilizer.is_valid():
             serilizer.save()
-            return Response({'msg':'Holder Updated Successfully','data':serilizer.data},status=status.HTTP_200_OK)
+            return Response({'msg':'Customer Updated Successfully','data':serilizer.data},status=status.HTTP_200_OK)
         return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
 
     def put(self,request,pk=None,format=None):
-        sh = Person.objects.get(Sh_id=pk)
+        sh = Person.objects.get(person_id=pk)
         serilizer = PersonSerilizer(sh,data=request.data)
         if  serilizer.is_valid():
             serilizer.save()
@@ -73,7 +73,7 @@ class ShreHolderFundView(APIView):
         serilizer =  ShareHolderFunsSerilizer(data=request.data)
         if serilizer.is_valid():
             serilizer.save()
-            return Response({'msg':'Data creates Successfully'},status=status.HTTP_201_CREATED)
+            return Response({'msg':'Data creates Successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
         else:
             return Response(serilizer.errors)
         
@@ -201,10 +201,8 @@ class RDintrestView(APIView):
         serilizer = RdIntersetOrignalSerilizer(rd,data=request.data) 
         if  serilizer.is_valid():
             serilizer.save()
-            return Response({'msg':'RDIntrest Updated Successfully','data':serilizer.data},status=status.HTTP_200_OK)
+            return Response({'msg':'RD Intrest Updated Successfully','data':serilizer.data},status=status.HTTP_200_OK)
         return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
-
-
 
 def merge_by_collection_date(queryset):
         merged_data = {}
@@ -629,6 +627,28 @@ class CashFlowStatement(APIView):
         return requiredata
 
 
+
+
+class StaffSalaryView(APIView):
+    
+    
+    def post(self,request,format=None):
+        serilizer = RDColloectionSerilizer(data=request.data,many=True)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'RD Intrest Created Successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+    def get(self,request,pk=None,format=None):
+        if pk is not None:
+            rd_collections = RDColl.objects.filter(rd_interest=pk)
+            merged_data = merge_by_collection_date(rd_collections)
+            serilizer = RDCollectionDataallSerializer(merged_data,many=True)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        else:   
+            rdintrest =RDColl.objects.all()
+            serilizer = RDColloectionSerilizer(rdintrest,many=True)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
 
 
 

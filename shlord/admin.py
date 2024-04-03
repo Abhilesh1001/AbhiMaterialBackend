@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Person,LoanInt,LoanColl,ShareHolder,RDColl,RDInt
+from .models import Person,LoanInt,LoanColl,ShareHolder,RDColl,RDInt,StaffSalary,Partuclars
 
 # Register your models here.
 
@@ -14,7 +14,7 @@ class AdminSShareHolderFuns(admin.ModelAdmin):
 
 @admin.register(RDInt)
 class AdminRdintrest(admin.ModelAdmin):
-    list_display = ['rd_id','person','time','start_date','closing_date','is_active','duration','interest_rate']
+    list_display = ['rd_id','person','time','start_date','closing_date','is_active','duration','interest_rate','usersf']
 
 
 @admin.register(RDColl)
@@ -30,6 +30,14 @@ class AdminLoanAmount(admin.ModelAdmin):
 @admin.register(LoanColl)
 class AdminLoanCollection(admin.ModelAdmin):
     list_display = ['loan_collection_id','loan_intrest','time','collection_date','amount_collected','remarks']
+
+@admin.register(StaffSalary)
+class AdminLoanStaffSalary(admin.ModelAdmin):
+    list_display = ['sd_id','person','time','usersf','collection_date','remarks']
+    
+@admin.register(Partuclars)
+class AdminLoanParicular(admin.ModelAdmin):
+    list_display = ['p_id','time','usersf','amount_Debit','amount_credit','particulars']
 
 
 

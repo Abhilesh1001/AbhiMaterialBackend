@@ -86,8 +86,7 @@ class LaonaAmountIntrestSerilizer(serializers.ModelSerializer):
 
     class Meta:
         model = LoanInt
-        fields = ['loan_id' 'person_id', 'person_name', 'loan_amount','usersf','remarks','is_active','time','start_date','days','duration','closing_date','interest_rate']
-
+        fields = ['loan_id', 'person_id', 'person_name', 'loan_amount', 'usersf', 'remarks', 'is_active', 'time', 'start_date', 'days', 'duration', 'closing_date', 'interest_rate']
 
 class LoanCollectionSerilizer(serializers.ModelSerializer):
     class Meta:

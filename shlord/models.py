@@ -85,6 +85,23 @@ class LoanColl(models.Model):
 
 
 
+class StaffSalary(models.Model):
+    sd_id= models.AutoField(primary_key=True)
+    person=models.ForeignKey(Person,on_delete=models.CASCADE)
+    time = models.DateTimeField(default = now)
+    usersf = models.ForeignKey(User,on_delete=models.CASCADE)
+    amount_Debit =  models.DecimalField(max_digits=10, decimal_places=3)
+    collection_date = models.DateTimeField(blank=True, null=True)
+    remarks = models.TextField(blank=True, null=True)
+    
+class Partuclars(models.Model):
+    p_id = models.AutoField(primary_key=True)
+    time = models.DateTimeField(default = now)
+    usersf = models.ForeignKey(User,on_delete=models.CASCADE)
+    amount_Debit =  models.DecimalField(max_digits=10, decimal_places=3)
+    amount_credit = models.DecimalField(max_digits=10, decimal_places=3)
+    particulars = models.TextField(blank=True, null=True)
+
 
 
 
