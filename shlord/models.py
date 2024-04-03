@@ -12,6 +12,7 @@ class Person(models.Model):
     pan_no =  models.CharField(max_length=50)
     phone_no = models.CharField(max_length=15)
     time = models.DateTimeField(default = now)
+    
 
 
 # share holder fund 
