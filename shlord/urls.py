@@ -34,5 +34,18 @@ urlpatterns = [
     
     # cashflowstatement 
     path('cashflow',views.CashFlowStatement.as_view()),
+
+
+    # staffsalary 
+    path('staffdepositr',views.StaffSalaryView.as_view()),
+    path('staffdepositr/<int:pk>',views.StaffSalaryView.as_view()),
+
+    # ParticularView 
+    path('particulars',views.ParticularView.as_view()),
+    path('particulars/<int:pk>',views.ParticularView.as_view()),
+
+
+
+
  
 ]

@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from cusauth.renderers import UserRenderer
-from .serilizer import PersonSerilizer,ShareHolderFunsSerilizer,ShareHolderFunsDataDisSerializer,SerilzerHOlderFund,RdIntersetOrignalSerilizer,RdIntersetSerilizer,RDColloectionSerilizer,RDCollectionDataallSerializer,RDCollectionDataSerializer,LaonaAmountSerilizer,LaonaAmountIntrestSerilizer,LoanCollectionSerilizer,LoanCollectionDataallSerializer,LoanCollectionDataSerializer
+from .serilizer import PersonSerilizer,ShareHolderFunsSerilizer,ShareHolderFunsDataDisSerializer,SerilzerHOlderFund,RdIntersetOrignalSerilizer,RdIntersetSerilizer,RDColloectionSerilizer,RDCollectionDataallSerializer,RDCollectionDataSerializer,LaonaAmountSerilizer,LaonaAmountIntrestSerilizer,LoanCollectionSerilizer,LoanCollectionDataallSerializer,LoanCollectionDataSerializer,StaffSerilizer ,ParticularSerilizer
 from .models import Person,LoanInt,LoanColl,ShareHolder,RDColl,RDInt,StaffSalary,Partuclars
 from collections import defaultdict
 from django.utils.timezone import make_aware
@@ -540,6 +540,59 @@ def collection_summary_fundcreditdistribute():
 
 
 
+
+
+
+def collection_summary_staffSalary():
+    staffSalary = StaffSalary.objects.values()
+    
+    summary_dict = {}
+ 
+    for item in staffSalary:
+        start_date = item['collection_date'].strftime('%Y-%m-%d')
+        sd_id = item['sd_id']
+        person_name = Person.objects.get(person_id=item['person_id'])
+
+        key = f'{start_date}_staff_{sd_id}'  # C reate a unique key combining start_date and loan_id
+        
+        # Check if the key already exists in the summary_dict, if not, initialize it with an empty list
+        if key not in summary_dict:
+            summary_dict[key] = []
+        
+        summary_dict[key].append({"amount_Debit": float(item['amount_Debit']), "shf_id": sd_id,'name':person_name.name,'person_id':item['person_id']})
+
+  
+    return summary_dict
+
+
+
+
+
+
+def collection_summary_particulars():
+    particulars = Partuclars.objects.values()
+    
+    summary_dict = {}
+ 
+    for item in particulars:
+        start_date = item['time'].strftime('%Y-%m-%d')
+        p_id = item['p_id']
+        
+
+        key = f'{start_date}_particulars_{p_id}'  # C reate a unique key combining start_date and loan_id
+        
+        # Check if the key already exists in the summary_dict, if not, initialize it with an empty list
+        if key not in summary_dict:
+            summary_dict[key] = []
+        
+        summary_dict[key].append({"amount_credit": float(item['amount_credit']),"amount_Debit": float(item['amount_Debit']), "p_id": p_id,'particular':item['particulars']})
+
+  
+    return summary_dict
+
+
+
+
 class CashFlowStatement(APIView):
     renderer_classes = [UserRenderer]
     permission_classes = [IsAuthenticated]
@@ -566,10 +619,17 @@ class CashFlowStatement(APIView):
             }
             dict_loan.append(dictnew)
         
+        staffSalary=collection_summary_staffSalary()
+        # print(shf,'shfdata')
+        particulars = collection_summary_particulars()
+        # print(particulars)
 
-        data = {"data":[dict_rd,dict_loan,shf,loancoll_date]}
+
+
+
+        data = {"data":[dict_rd,dict_loan,shf,loancoll_date,staffSalary,particulars]}
    
-        print('...')
+       
 
         
 
@@ -610,47 +670,113 @@ class CashFlowStatement(APIView):
                 dict = {key:item}
                 newdata.append(dict)
 
+        newDatanew = data['data'][4]
+        # print(newDatanew,'..........')
 
+        for key, value in newDatanew.items():
+            # print(key)
+            for item in value:
+                # print(item)
+                dict = {key:item}
+                newdata.append(dict)
+
+        newDatanew = data['data'][5]
+        # print(newDatanew,'..........')
+
+        for key, value in newDatanew.items():
+            # print(key)
+            for item in value:
+                # print(item)
+                dict = {key:item}
+                newdata.append(dict)
 
         requiredata = []
         sorted_data = sorted(newdata, key=lambda x: list(x.keys())[0])
         for item in sorted_data:
             for key, value in item.items():
-                print(key,value)
+                # print(key,value)
                 dict =  {
                     key :value 
                 }
                 requiredata.append(dict)
 
-                
-
+        
+        
+        
+            
         return requiredata
-
-
 
 
 class StaffSalaryView(APIView):
     
-    
     def post(self,request,format=None):
-        serilizer = RDColloectionSerilizer(data=request.data,many=True)
+        serilizer = StaffSerilizer(data=request.data)
         if serilizer.is_valid():
             serilizer.save()
-            return Response({'msg':'RD Intrest Created Successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
+            return Response({'msg':'Staff Amount Deposited Successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
         return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
     
     def get(self,request,pk=None,format=None):
         if pk is not None:
-            rd_collections = RDColl.objects.filter(rd_interest=pk)
-            merged_data = merge_by_collection_date(rd_collections)
-            serilizer = RDCollectionDataallSerializer(merged_data,many=True)
+            staff_salary = StaffSalary.objects.get(sd_id=pk)
+            serilizer = StaffSerilizer(staff_salary)
             return Response(serilizer.data,status=status.HTTP_200_OK)
         else:   
-            rdintrest =RDColl.objects.all()
-            serilizer = RDColloectionSerilizer(rdintrest,many=True)
+            staff_salary =StaffSalary.objects.all()
+            serilizer = StaffSerilizer(staff_salary,many=True)
             return Response(serilizer.data,status=status.HTTP_200_OK)
+    
+    def put(self,request,pk=None,format=None):
+        staff_sal = StaffSalary.objects.get(sd_id=pk)
+        serilizer = StaffSerilizer(staff_sal,data=request.data)
+        if  serilizer.is_valid():
+            serilizer.save()
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        
+    def patch(self,request,pk=None,format=None):
+        staff_sal = StaffSalary.objects.get(sd_id=pk)
+        serilizer = StaffSerilizer(staff_sal,data=request.data)
+        if  serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'Salsry Updated Succefully','data':serilizer.data},status=status.HTTP_200_OK)
 
 
+
+
+
+
+class ParticularView(APIView):
+    
+    def post(self,request,format=None):
+        serilizer = ParticularSerilizer(data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'Particulars Amount Deposited Successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+    def get(self,request,pk=None,format=None):
+        if pk is not None:
+            particulars = Partuclars.objects.get(p_id=pk)
+            serilizer = ParticularSerilizer(particulars)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        else:   
+            particulars=Partuclars.objects.all()
+            serilizer = ParticularSerilizer(particulars,many=True)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+    
+    def put(self,request,pk=None,format=None):
+        staff_sal = Partuclars.objects.get(p_id=pk)
+        serilizer = ParticularSerilizer(staff_sal,data=request.data)
+        if  serilizer.is_valid():   
+            serilizer.save()
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        
+    def patch(self,request,pk=None,format=None):
+        staff_sal = Partuclars.objects.get(p_id=pk)
+        serilizer = ParticularSerilizer(staff_sal,data=request.data)
+        if  serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'Particular Updated Succefully','data':serilizer.data},status=status.HTTP_200_OK)
 
 
 
