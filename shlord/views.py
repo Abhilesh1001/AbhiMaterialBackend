@@ -4,8 +4,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from cusauth.renderers import UserRenderer
-from .serilizer import PersonSerilizer,ShareHolderFunsSerilizer,ShareHolderFunsDataDisSerializer,SerilzerHOlderFund,RdIntersetOrignalSerilizer,RdIntersetSerilizer,RDColloectionSerilizer,RDCollectionDataallSerializer,RDCollectionDataSerializer,LaonaAmountSerilizer,LaonaAmountIntrestSerilizer,LoanCollectionSerilizer,LoanCollectionDataallSerializer,LoanCollectionDataSerializer,StaffSerilizer ,ParticularSerilizer
-from .models import Person,LoanInt,LoanColl,ShareHolder,RDColl,RDInt,StaffSalary,Partuclars
+from .serilizer import PersonSerilizer,ShareHolderFunsSerilizer,ShareHolderFunsDataDisSerializer,SerilzerHOlderFund,RdIntersetOrignalSerilizer,RdIntersetSerilizer,RDColloectionSerilizer,RDCollectionDataallSerializer,RDCollectionDataSerializer,LaonaAmountSerilizer,LaonaAmountIntrestSerilizer,LoanCollectionSerilizer,LoanCollectionDataallSerializer,LoanCollectionDataSerializer,StaffSerilizer ,ParticularSerilizer,FixedDepositeSerilizer,AssetSerilizer
+from .models import Person,LoanInt,LoanColl,ShareHolder,RDColl,RDInt,StaffSalary,Partuclars,FixedDeposite,Asset
 from collections import defaultdict
 from django.utils.timezone import make_aware
 from datetime import datetime
@@ -706,8 +706,10 @@ class CashFlowStatement(APIView):
             
         return requiredata
 
-
+ 
 class StaffSalaryView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
     
     def post(self,request,format=None):
         serilizer = StaffSerilizer(data=request.data)
@@ -740,12 +742,9 @@ class StaffSalaryView(APIView):
             serilizer.save()
             return Response({'msg':'Salsry Updated Succefully','data':serilizer.data},status=status.HTTP_200_OK)
 
-
-
-
-
-
 class ParticularView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
     
     def post(self,request,format=None):
         serilizer = ParticularSerilizer(data=request.data)
@@ -779,5 +778,76 @@ class ParticularView(APIView):
             return Response({'msg':'Particular Updated Succefully','data':serilizer.data},status=status.HTTP_200_OK)
 
 
+
+
+class FixedDepositeView(APIView):
+   
+    
+    def post(self,request,format=None):
+        serilizer = FixedDepositeSerilizer(data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'Fixed Amount Deposited Successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+    def get(self,request,pk=None,format=None):
+        if pk is not None:
+            fixed_deposite = FixedDeposite.objects.get(fd_id=pk)
+            serilizer = FixedDepositeSerilizer(fixed_deposite)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        else:   
+            fixed_deposite =FixedDeposite.objects.all()
+            serilizer = FixedDepositeSerilizer(fixed_deposite,many=True)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+    
+    def put(self,request,pk=None,format=None):
+        fixed_deposite = FixedDeposite.objects.get(fd_id=pk)
+        serilizer = FixedDepositeSerilizer(fixed_deposite,data=request.data)
+        if  serilizer.is_valid():
+            serilizer.save()
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        
+    def patch(self,request,pk=None,format=None):
+        fixed_deposite = FixedDeposite.objects.get(fd_id=pk)
+        serilizer = FixedDepositeSerilizer(fixed_deposite,data=request.data)
+        if  serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'Fixed Deposite Updated SuccessFully','data':serilizer.data},status=status.HTTP_200_OK)
+
+
+
+class AssetView(APIView):
+   
+
+    def post(self,request,format=None):
+        serilizer = AssetSerilizer(data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'Asset has created Successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+    def get(self,request,pk=None,format=None):
+        if pk is not None:
+            asset = Asset.objects.get(asset_no=pk)
+            serilizer = AssetSerilizer(asset)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        else:   
+            asset =Asset.objects.all()
+            serilizer = AssetSerilizer(asset,many=True)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+    
+    def put(self,request,pk=None,format=None):
+        asset = Asset.objects.get(asset_no=pk)
+        serilizer = AssetSerilizer(asset,data=request.data)
+        if  serilizer.is_valid():
+            serilizer.save()
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        
+    def patch(self,request,pk=None,format=None):
+        asset = Asset.objects.get(asset_no=pk)
+        serilizer = AssetSerilizer(asset,data=request.data)
+        if  serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'Asset Updated SuccessFully','data':serilizer.data},status=status.HTTP_200_OK)
 
 

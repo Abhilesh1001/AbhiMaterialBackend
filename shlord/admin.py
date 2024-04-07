@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Person,LoanInt,LoanColl,ShareHolder,RDColl,RDInt,StaffSalary,Partuclars
+from .models import Person,LoanInt,LoanColl,ShareHolder,RDColl,RDInt,StaffSalary,Partuclars,FixedDeposite,Asset
 
 # Register your models here.
 
@@ -39,5 +39,12 @@ class AdminLoanStaffSalary(admin.ModelAdmin):
 class AdminLoanParicular(admin.ModelAdmin):
     list_display = ['p_id','time','usersf','amount_Debit','amount_credit','particulars']
 
+
+@admin.register(FixedDeposite)
+class AdminFixedDeposite(admin.ModelAdmin):
+    list_display = ['fd_id','time','usersf','amount_Debit','amount_credit','collection_date','start_date','closing_date','duration','interest_rate','is_active','person']
+@admin.register(Asset)
+class AdminAsset(admin.ModelAdmin):
+    list_display = ['asset_no','time','usersf','amount_Debit','debit_date']
 
 

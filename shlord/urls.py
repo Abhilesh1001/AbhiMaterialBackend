@@ -45,6 +45,13 @@ urlpatterns = [
     path('particulars/<int:pk>',views.ParticularView.as_view()),
 
 
+    # fixedDeposite 
+    path('fixed',views.FixedDepositeView.as_view()),
+    path('fixed/<int:pk>',views.FixedDepositeView.as_view()),
+
+    # asset 
+    path('asset',views.AssetView.as_view()),
+    path('asset/<int:pk>',views.AssetView.as_view()),
 
 
  

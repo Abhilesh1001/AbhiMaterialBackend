@@ -106,6 +106,27 @@ class Partuclars(models.Model):
 
 
 
+class FixedDeposite(models.Model):
+    fd_id= models.AutoField(primary_key=True)
+    time = models.DateTimeField(default = now)
+    usersf=models.ForeignKey(User,on_delete=models.CASCADE,default=1)
+    amount_Debit =  models.DecimalField(max_digits=10, decimal_places=3,default=0)
+    amount_credit = models.DecimalField(max_digits=10, decimal_places=3,default=0) 
+    collection_date = models.DateTimeField(blank=True, null=True)
+    start_date = models.DateTimeField(blank=True, null=True)
+    closing_date = models.DateTimeField(blank=True, null=True)
+    duration = models.DecimalField(max_digits=10, decimal_places=3,default=0)
+    interest_rate =  models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    person=models.ForeignKey(Person,on_delete=models.CASCADE,default=1)
+
+class Asset(models.Model):
+    asset_no =models.AutoField(primary_key=True) 
+    time = models.DateTimeField(default = now)
+    asset_name = models.TextField(blank=True, null=True,default='')
+    usersf=models.ForeignKey(User,on_delete=models.CASCADE,default=1)
+    amount_Debit =  models.DecimalField(max_digits=10, decimal_places=3,default=0)
+    debit_date = models.DateTimeField(blank=True, null=True)
 
 
 

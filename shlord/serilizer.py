@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Person,LoanInt,LoanColl,ShareHolder,RDColl,RDInt,StaffSalary,Partuclars
+from .models import Person,LoanInt,LoanColl,ShareHolder,RDColl,RDInt,StaffSalary,Partuclars,FixedDeposite,Asset
 
 
 class PersonSerilizer(serializers.ModelSerializer):
@@ -125,5 +125,17 @@ class StaffSerilizer(serializers.ModelSerializer):
 class ParticularSerilizer(serializers.ModelSerializer):
     class Meta:
         model = Partuclars
+        fields = '__all__'
+
+
+class FixedDepositeSerilizer(serializers.ModelSerializer):
+    class Meta:
+        model = FixedDeposite
+        fields = '__all__'
+
+
+class AssetSerilizer(serializers.ModelSerializer):
+    class Meta:
+        model = Asset 
         fields = '__all__'
 
