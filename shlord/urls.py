@@ -53,6 +53,7 @@ urlpatterns = [
     path('asset',views.AssetView.as_view()),
     path('asset/<int:pk>',views.AssetView.as_view()),
 
-
+    # profit and loss 
+    path('profitandloss',views.ProfitandLoss.as_view())
  
 ]

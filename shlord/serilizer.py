@@ -49,8 +49,6 @@ class RDColloectionSerilizer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-from rest_framework import serializers
-
 class RDCollectionDataallSerializer(serializers.ModelSerializer):
     person_name = serializers.CharField(source='rd_interest.person.name')
     person_id = serializers.IntegerField(source='rd_interest.person.person_id')
@@ -59,10 +57,11 @@ class RDCollectionDataallSerializer(serializers.ModelSerializer):
     start_date = serializers.DateTimeField(source='rd_interest.start_date')
     closing_date = serializers.DateTimeField(source='rd_interest.closing_date')
     is_active = serializers.BooleanField(source='rd_interest.is_active')
+    rd_id  = serializers.IntegerField(source='rd_interest.rd_id')
 
     class Meta:
         model = RDColl
-        fields = ['rd_interest', 'person_name', 'duration', 'interest', 'is_active', 'start_date', 'closing_date', 'person_id', 'amount_collected', 'usersf', 'remarks', 'collection_date']
+        fields = ['rd_interest', 'person_name', 'duration', 'interest', 'is_active', 'start_date', 'closing_date', 'person_id', 'amount_collected', 'usersf', 'remarks', 'collection_date','rd_id']
 
 
 class RDCollectionDataSerializer(serializers.ModelSerializer):
@@ -104,9 +103,10 @@ class LoanCollectionDataallSerializer(serializers.ModelSerializer):
     start_date = serializers.CharField(source='loan_intrest.start_date')
     closing_date = serializers.CharField(source='loan_intrest.closing_date')
     interest = serializers.IntegerField(source='loan_intrest.interest_rate')
+    loan_id = serializers.IntegerField(source='loan_intrest.loan_id')
     class Meta:
         model = LoanColl
-        fields = ['person_name','person_id','loan_amount','is_active','duration','start_date','closing_date','interest','loan_intrest','collection_date','amount_collected','remarks']
+        fields = ['person_name','person_id','loan_amount','is_active','duration','start_date','closing_date','interest','loan_intrest','collection_date','amount_collected','remarks','loan_id']
 
 
 class LoanCollectionDataSerializer(serializers.ModelSerializer):
@@ -138,4 +138,20 @@ class AssetSerilizer(serializers.ModelSerializer):
     class Meta:
         model = Asset 
         fields = '__all__'
+
+
+class StaffSerilizerwithname(serializers.ModelSerializer):
+    person_name = serializers.CharField(source='person.name')
+    person_id = serializers.IntegerField(source='person.person_id')
+    class Meta:
+        model = StaffSalary
+        fields = ['sd_id','person_name','person_id','time','amount_Debit','collection_date','remarks']
+
+
+class FixedDepositeName(serializers.ModelSerializer):
+    person_name = serializers.CharField(source='person.name')
+    person_id = serializers.IntegerField(source='person.person_id')
+    class Meta:
+        model = FixedDeposite
+        fields = ['fd_id','person_name','person_id','time','usersf','amount_Debit','amount_credit','collection_date','start_date','closing_date','duration','interest_rate','is_active']
 

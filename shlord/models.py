@@ -69,10 +69,6 @@ class LoanInt(models.Model):
     closing_date = models.DateTimeField(blank=True, null=True)
     interest_rate =  models.IntegerField()
 
-    def save(self, *args, **kwargs):
-        if not self.pk:  # This check ensures that it's a new loan (creation).
-            self.opening_date = now()
-        super().save(*args, **kwargs)
 
 
 class LoanColl(models.Model):
@@ -86,6 +82,8 @@ class LoanColl(models.Model):
 
 
 
+
+# staff 
 class StaffSalary(models.Model):
     sd_id= models.AutoField(primary_key=True)
     person=models.ForeignKey(Person,on_delete=models.CASCADE)
@@ -95,6 +93,10 @@ class StaffSalary(models.Model):
     collection_date = models.DateTimeField(blank=True, null=True)
     remarks = models.TextField(blank=True, null=True)
     
+
+    
+# Particulars / Expenses
+
 class Partuclars(models.Model):
     p_id = models.AutoField(primary_key=True)
     time = models.DateTimeField(default = now)
@@ -104,8 +106,7 @@ class Partuclars(models.Model):
     particulars = models.TextField(blank=True, null=True)
 
 
-
-
+# fixdeposite 
 class FixedDeposite(models.Model):
     fd_id= models.AutoField(primary_key=True)
     time = models.DateTimeField(default = now)
@@ -120,6 +121,8 @@ class FixedDeposite(models.Model):
     is_active = models.BooleanField(default=True)
     person=models.ForeignKey(Person,on_delete=models.CASCADE,default=1)
 
+
+# assets 
 class Asset(models.Model):
     asset_no =models.AutoField(primary_key=True) 
     time = models.DateTimeField(default = now)
