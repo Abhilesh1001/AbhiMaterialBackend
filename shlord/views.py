@@ -111,25 +111,20 @@ class ShreHolderFundView(APIView):
 
 
     def put(self,request,pk=None,format=None):
-        sh = ShareHolder.objects.get(Sh_id=pk)
+        sh = ShareHolder.objects.get(shf_id=pk)
         serilizer = ShareHolderFunsSerilizer(sh,data=request.data)
         if  serilizer.is_valid():
             serilizer.save()
             return Response(serilizer.data,status=status.HTTP_200_OK)
         
     def patch(self,request,pk=None,format=None):
-        sh = ShareHolder.objects.get(Sh_id=pk)
+        sh = ShareHolder.objects.get(shf_id=pk)
         serilizer = ShareHolderFunsSerilizer(sh,data=request.data)
         if  serilizer.is_valid():
             serilizer.save()
-            return Response(serilizer.data,status=status.HTTP_200_OK)
-        
-    def put(self,request,pk=None,format=None):
-        sh = ShareHolder.objects.get(Sh_id=pk)
-        serilizer = ShareHolderFunsSerilizer(sh,data=request.data)
-        if  serilizer.is_valid():
-            serilizer.save()
-            return Response(serilizer.data,status=status.HTTP_200_OK)
+            return Response({'msg':'Share Fund Updated Successfully','data':serilizer.data},status=status.HTTP_200_OK)
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)        
+
       
 
 def shfview():
@@ -631,9 +626,6 @@ def collection_summary_fixed_deposite():
 
 
 
-
-
-
 class CashFlowStatement(APIView):
     renderer_classes = [UserRenderer]
     permission_classes = [IsAuthenticated]
@@ -927,11 +919,10 @@ class AssetView(APIView):
 # profit and  RD collection 
 
 
-
-
-
-
 class ProfitandLoss(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+
     def post(self,request,format=None):
         start_date = request.data.get('start_date')  # Format: 'YYYY-MM-DD'
         end_date = request.data.get('end_date')      # Format: 'YYYY-MM-DD'
@@ -942,6 +933,7 @@ class ProfitandLoss(APIView):
         # RD collection 
         RD_intrest = RDInt.objects.all()
         serialized_rd_intrest = RdIntersetSerilizer(RD_intrest, many=True)
+        
 
         data = []
         for item in serialized_rd_intrest.data:
@@ -965,11 +957,14 @@ class ProfitandLoss(APIView):
         loan_all_data = []
         loan_int = LoanInt.objects.all()
         serialized_loan = LaonaAmountIntrestSerilizer(loan_int, many=True)
+        # print(serialized_loan.data,'dataserilize')
+        
         for item in serialized_loan.data:
             loanColl = LoanColl.objects.filter(loan_intrest=item['loan_id'])
-            print(loanColl)
+            
             merge_data = merge_by_collection_date_Loan(loanColl)
             serilizeLoanColl = LoanCollectionDataallSerializer(merge_data,many=True)
+            print(serilizeLoanColl.data,'dataserilize')
             table_loan = render_table_rows_loan(serilizeLoanColl.data)
             update_emi_loan(serilizeLoanColl.data,table_loan)
             # print(table_loan)
@@ -1223,6 +1218,7 @@ def AddRdCollectionIntrest(allDataRdColl, start_date, end_date):
 
 
 def AddLoanCollectionIntrest(allDataLoanColl, start_date, end_date):
+
     total_interest_loan = 0
 
     # Convert start_date and end_date to datetime objects if they are not already
@@ -1240,3 +1236,16 @@ def AddLoanCollectionIntrest(allDataLoanColl, start_date, end_date):
                     total_interest_loan += loan_data['intrest']
 
     return total_interest_loan
+
+class ShreHolderFundGetData(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+    def get(self,request,pk=None,format=None):
+        if pk is not None:
+            shf = ShareHolder.objects.get(shf_id=pk)
+            serilizer = ShareHolderFunsDataDisSerializer(shf)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        else:   
+            sh = ShareHolder.objects.all()
+            serilizer =  ShareHolderFunsDataDisSerializer(sh,many= True)
+            return Response(serilizer.data,status=status.HTTP_200_OK)

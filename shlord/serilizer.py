@@ -21,6 +21,7 @@ class ShareHolderFunsDataDisSerializer(serializers.Serializer):
     amount_Debit = serializers.DecimalField(max_digits=10, decimal_places=3, default=0.0, allow_null=True)
     collection_date = serializers.DateTimeField(allow_null=True)
     time = serializers.DateTimeField()
+    particulars = serializers.CharField()
 
 class SerilzerHOlderFund(serializers.Serializer):
     shf_id = serializers.IntegerField()
@@ -100,7 +101,7 @@ class LoanCollectionDataallSerializer(serializers.ModelSerializer):
     loan_amount = serializers.IntegerField(source='loan_intrest.loan_amount')
     is_active = serializers.BooleanField(source='loan_intrest.is_active')
     duration= serializers.IntegerField(source='loan_intrest.duration')
-    start_date = serializers.CharField(source='loan_intrest.start_date')
+    start_date = serializers.DateTimeField(source='loan_intrest.start_date')
     closing_date = serializers.CharField(source='loan_intrest.closing_date')
     interest = serializers.IntegerField(source='loan_intrest.interest_rate')
     loan_id = serializers.IntegerField(source='loan_intrest.loan_id')

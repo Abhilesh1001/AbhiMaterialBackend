@@ -6,12 +6,15 @@ from django.utils.timezone import now
 
 class Person(models.Model):
     person_id = models.AutoField(primary_key=True)
-    name= models.CharField(max_length=100)
-    email =models.EmailField(max_length=50)
+    name= models.CharField(max_length=100,default='')
+    email =models.EmailField(max_length=50,default='')
     usersf = models.ForeignKey(User,on_delete=models.CASCADE)
-    pan_no =  models.CharField(max_length=50)
-    phone_no = models.CharField(max_length=15)
+    pan_no =  models.CharField(max_length=50,default='')
+    phone_no = models.CharField(max_length=15,default='')
     time = models.DateTimeField(default = now)
+    address =  models.TextField(default='')
+    adharcard = models.CharField(max_length=50,default='')    
+
     
 
 

@@ -12,6 +12,7 @@ urlpatterns = [
      # Share collection  
      path('shfund', views.ShreHolderFundView.as_view()),
      path('shfund/<int:pk>/', views.ShreHolderFundView.as_view()),
+     path('shfundget/<int:pk>/', views.ShreHolderFundGetData.as_view()),
      path('capialDisview',views.CapitalDisclouserview.as_view()),
 
     # RD Interest  
