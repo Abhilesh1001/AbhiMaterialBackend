@@ -76,7 +76,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.is_admin
 
 
-
+  
 class ProfileUpdate(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     Date_of_Birth = models.CharField(max_length=50)

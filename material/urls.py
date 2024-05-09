@@ -30,4 +30,17 @@ urlpatterns = [
 
     # orignal poview 
     path('poview/<int:pk>/', views.OrPuchaseOrderView.as_view()),
+
+    # Materil Unit 
+    path('materialgroup',views.MaterialGroupView.as_view()),
+    path('materilgroup/<int:pk>/',views.MaterialGroupView.as_view()),
+
+    # Materil Group 
+    path('materialunit',views.MaterialUnitView.as_view()),
+    path('materialunit/<int:pk>/',views.MaterialUnitView.as_view()),
+
+
+
+
+
 ]

@@ -69,6 +69,7 @@ class MaterialGroup(models.Model):
 class MaterialUnit(models.Model):
     unit_no = models.AutoField(primary_key=True)
     material_umit = models.CharField(max_length=40,default='')
+    materil_unit_desc = models.CharField(max_length=100,default='')
 
 
 

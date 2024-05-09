@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Material,PurchaseRequestNew,Vendor,DeliveryAdress,PurchaseOrder
+from .models import Material,PurchaseRequestNew,Vendor,DeliveryAdress,PurchaseOrder,MaterialGroup,MaterialUnit
 
 
 
@@ -30,3 +30,15 @@ class PurchaseOrderSerilizer(serializers.ModelSerializer):
     class Meta:
         model = PurchaseOrder
         fields = '__all__'
+
+
+class MaterialGroupSerilizer(serializers.ModelSerializer):
+    class Meta:
+        model = MaterialGroup
+        fields = '__all__'
+
+
+class MaterilUnitSerilizer(serializers.ModelSerializer):
+    class Meta:
+        model = MaterialUnit
+        fields ="__all__"

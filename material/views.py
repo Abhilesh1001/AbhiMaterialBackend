@@ -1,10 +1,10 @@
 from django.shortcuts import render,HttpResponse
-from . models import Material,PurchaseRequestNew,Vendor,DeliveryAdress,PurchaseOrder
+from . models import Material,PurchaseRequestNew,Vendor,DeliveryAdress,PurchaseOrder,MaterialUnit,MaterialGroup
 from cusauth.models import User 
 from cusauth.renderers import UserRenderer
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from .serlilizer import MaterialSerlizer,PurchaseRequestSerializer,VendorSErilizer,DeliverySerilizer,PurchaseOrderSerilizer
+from .serlilizer import MaterialSerlizer,PurchaseRequestSerializer,VendorSErilizer,DeliverySerilizer,PurchaseOrderSerilizer,MaterialGroupSerilizer,MaterilUnitSerilizer
 from rest_framework.response import Response
 from rest_framework import status 
 import json
@@ -706,3 +706,86 @@ class PurchaseOrderAdvance(APIView):
              po = PurchaseOrder.objects.all()
              serilizer = PurchaseOrderSerilizer(po,many=True)
              return Response(serilizer.data,status=status.HTTP_200_OK) 
+
+
+class MaterialGroupView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+    def post(self,request,format=None):
+        serilizer = MaterialGroupSerilizer(data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'Data creates successfully ','data':serilizer.data})
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self,request,pk=None,format=None):
+
+        if pk is None:
+            mat = MaterialGroup.objects.all()
+            serilizer =MaterialGroupSerilizer(mat,many =True)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        else:
+            pro = MaterialGroup.objects.get(s_no=pk) 
+            serilizer = MaterialGroupSerilizer(pro)
+            return Response(serilizer.data)
+
+    
+
+    def put(self,request,pk=None,format=None):
+        mat = MaterialGroup.objects.get(pk=pk)
+        # print(mat)
+        serilizer = MaterialGroupSerilizer(mat,data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response(serilizer.data)
+        return Response(serilizer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self,request,pk=None,format=None):
+        mat = MaterialGroup.objects.get(pk=pk)
+        serilizer = MaterialGroupSerilizer(mat,data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg': 'Material Group Updated ','data':serilizer.data},status=status.HTTP_200_OK)
+        return Response(serilizer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+        
+
+class MaterialUnitView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+    def post(self,request,format=None):
+        serilizer = MaterilUnitSerilizer(data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'Data creates successfully ','data':serilizer.data})
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self,request,pk=None,format=None):
+
+        if pk is None:
+            mat = MaterialUnit.objects.all()
+            serilizer =MaterilUnitSerilizer(mat,many =True)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        else:
+            pro = MaterialUnit.objects.get(s_no=pk) 
+            serilizer = MaterilUnitSerilizer(pro)
+            return Response(serilizer.data)
+
+    
+
+    def put(self,request,pk=None,format=None):
+        mat = MaterialUnit.objects.get(pk=pk)
+        # print(mat)
+        serilizer = MaterilUnitSerilizer(mat,data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response(serilizer.data)
+        return Response(serilizer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self,request,pk=None,format=None):
+        mat = MaterialUnit.objects.get(pk=pk)
+        serilizer = MaterilUnitSerilizer(mat,data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg': 'Material Unit Updated ','data':serilizer.data},status=status.HTTP_200_OK)
+        return Response(serilizer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -35,5 +35,5 @@ class AdminMaterilaGroup(admin.ModelAdmin):
 
 @admin.register(MaterialUnit)
 class AdminMaterilaUnit(admin.ModelAdmin):
-    list_display=['unit_no','material_umit']
+    list_display=['unit_no','material_umit','materil_unit_desc']
 
