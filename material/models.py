@@ -73,4 +73,10 @@ class MaterialUnit(models.Model):
 
 
 
+class StoreLocation(models.Model):
+    store_no = models.AutoField(primary_key=True)
+    store_id =  models.CharField(max_length=4)
+    store_description =  models.CharField(max_length=100)
+
+
 
