@@ -40,14 +40,6 @@ class PurchaseRequestNew(models.Model):
     item_json = models.CharField(max_length=100000,default='')
 
 
-class DeliveryAdress(models.Model):
-    s_no = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=100)
-    phone_no = models.CharField(max_length=15)
-    vendor_name = models.CharField(max_length=100)
-    gst = models.CharField(max_length=100)
-    email = models.CharField(max_length=50)
-    address = models.CharField(max_length=100)
 
 
 class PurchaseOrder(models.Model):
@@ -77,6 +69,25 @@ class StoreLocation(models.Model):
     store_no = models.AutoField(primary_key=True)
     store_id =  models.CharField(max_length=4)
     store_description =  models.CharField(max_length=100)
+
+
+class CompanyAddress(models.Model):
+    s_no = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+    address = models.CharField(max_length=100)
+
+
+
+class DeliveryAdress(models.Model):
+    s_no = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100,default='')
+    phone_no = models.CharField(max_length=15,default='')
+    vendor_name = models.CharField(max_length=100,default='')
+    gst = models.CharField(max_length=100,default='')
+    email = models.CharField(max_length=50,default='')
+    address = models.CharField(max_length=100,default='')
+    company_address = models.ForeignKey(CompanyAddress,on_delete = models.CASCADE,)
+
 
 
 

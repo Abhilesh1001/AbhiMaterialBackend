@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Material,PurchaseRequest,Vendor,PurchaseRequestNew,DeliveryAdress,PurchaseOrder,MaterialGroup,MaterialUnit,StoreLocation
+from .models import Material,PurchaseRequest,Vendor,PurchaseRequestNew,DeliveryAdress,PurchaseOrder,MaterialGroup,MaterialUnit,StoreLocation,CompanyAddress
 
 # Register your models here.
 
@@ -41,4 +41,8 @@ class AdminMaterilaUnit(admin.ModelAdmin):
 @admin.register(StoreLocation)
 class AdminStoreLocation(admin.ModelAdmin):
     list_display=['store_no','store_id','store_description']
+
+@admin.register(CompanyAddress)
+class AdminCompanyAddress(admin.ModelAdmin):
+    list_display=['s_no','name','address']
 
