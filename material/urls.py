@@ -39,7 +39,8 @@ urlpatterns = [
     path('materialunit',views.MaterialUnitView.as_view()),
     path('materialunit/<int:pk>/',views.MaterialUnitView.as_view()),
 
-
-    
+    # company address
+    path('companyaddress',views.CompanyAddressView.as_view()),
+    path('companyaddress/<int:pk>/',views.CompanyAddressView.as_view()),
 
 ]

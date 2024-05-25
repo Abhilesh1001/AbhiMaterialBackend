@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Material,PurchaseRequestNew,Vendor,DeliveryAdress,PurchaseOrder,MaterialGroup,MaterialUnit,StoreLocation
+from .models import Material,PurchaseRequestNew,Vendor,DeliveryAdress,PurchaseOrder,MaterialGroup,MaterialUnit,StoreLocation,CompanyAddress
 
 
 
@@ -49,3 +49,11 @@ class MaterilaStoreLocationSerilizer(serializers.ModelSerializer):
     class Meta:
         model =  StoreLocation 
         fields = "__all__"
+
+    
+class CompanyAddressSerilizer(serializers.ModelSerializer):
+    class Meta:
+        model= CompanyAddress
+        fields = '__all__'
+
+        

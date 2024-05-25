@@ -1,10 +1,10 @@
 from django.shortcuts import render,HttpResponse
-from . models import Material,PurchaseRequestNew,Vendor,DeliveryAdress,PurchaseOrder,MaterialUnit,MaterialGroup,StoreLocation
+from . models import Material,PurchaseRequestNew,Vendor,DeliveryAdress,PurchaseOrder,MaterialUnit,MaterialGroup,StoreLocation,CompanyAddress
 from cusauth.models import User 
 from cusauth.renderers import UserRenderer
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from .serlilizer import MaterialSerlizer,PurchaseRequestSerializer,VendorSErilizer,DeliverySerilizer,PurchaseOrderSerilizer,MaterialGroupSerilizer,MaterilUnitSerilizer,MaterilaStoreLocationSerilizer
+from .serlilizer import MaterialSerlizer,PurchaseRequestSerializer,VendorSErilizer,DeliverySerilizer,PurchaseOrderSerilizer,MaterialGroupSerilizer,MaterilUnitSerilizer,MaterilaStoreLocationSerilizer,CompanyAddressSerilizer
 from rest_framework.response import Response
 from rest_framework import status 
 import json
@@ -830,4 +830,45 @@ class MaterialStoreLocationView(APIView):
         if serilizer.is_valid():
             serilizer.save()
             return Response({'msg': 'Store Location Updated ','data':serilizer.data},status=status.HTTP_200_OK)
+        return Response(serilizer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CompanyAddressView(APIView):
+    renderer_classes = [UserRenderer]
+    permission_classes = [IsAuthenticated]
+    def post(self,request,format=None):
+        serilizer = CompanyAddressSerilizer(data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg':'Data creates successfully ','data':serilizer.data})
+        return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self,request,pk=None,format=None):
+
+        if pk is None:
+            mat = CompanyAddress.objects.all()
+            serilizer =CompanyAddressSerilizer(mat,many =True)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        else:
+            pro = CompanyAddress.objects.get(s_no=pk) 
+            serilizer = CompanyAddressSerilizer(pro)
+            return Response(serilizer.data)
+
+    
+
+    def put(self,request,pk=None,format=None):
+        mat = CompanyAddress.objects.get(s_no=pk)
+        # print(mat)
+        serilizer = CompanyAddressSerilizer(mat,data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response(serilizer.data)
+        return Response(serilizer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self,request,pk=None,format=None):
+        mat =CompanyAddress.objects.get(s_no=pk)
+        serilizer = CompanyAddressSerilizer(mat,data=request.data)
+        if serilizer.is_valid():
+            serilizer.save()
+            return Response({'msg': 'Company address Updated ','data':serilizer.data},status=status.HTTP_200_OK)
         return Response(serilizer.errors, status=status.HTTP_400_BAD_REQUEST)
