@@ -56,4 +56,12 @@ class CompanyAddressSerilizer(serializers.ModelSerializer):
         model= CompanyAddress
         fields = '__all__'
 
+class DeliverySerilizerAll(serializers.ModelSerializer):
+    company_s_no = serializers.IntegerField(source='company_address.s_no')
+    company_name = serializers.CharField(source='company_address.name')
+    company_address =  serializers.CharField(source='company_address.address')
+    class Meta:
+        model = DeliveryAdress
+        fields = ['s_no','company_s_no','company_name','company_address','name','phone_no','vendor_name','gst','email','address']
+
         

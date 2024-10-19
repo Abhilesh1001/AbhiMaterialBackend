@@ -1,10 +1,10 @@
 from django.shortcuts import render,HttpResponse
-from . models import Material,PurchaseRequestNew,Vendor,DeliveryAdress,PurchaseOrder,MaterialUnit,MaterialGroup,StoreLocation,CompanyAddress
+from . models import Material,PurchaseRequestNew,Vendor,DeliveryAdress,PurchaseOrder,MaterialUnit,MaterialGroup,StoreLocation,CompanyAddress 
 from cusauth.models import User 
 from cusauth.renderers import UserRenderer
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from .serlilizer import MaterialSerlizer,PurchaseRequestSerializer,VendorSErilizer,DeliverySerilizer,PurchaseOrderSerilizer,MaterialGroupSerilizer,MaterilUnitSerilizer,MaterilaStoreLocationSerilizer,CompanyAddressSerilizer
+from .serlilizer import MaterialSerlizer,PurchaseRequestSerializer,VendorSErilizer,DeliverySerilizer,PurchaseOrderSerilizer,MaterialGroupSerilizer,MaterilUnitSerilizer,MaterilaStoreLocationSerilizer,CompanyAddressSerilizer,DeliverySerilizerAll
 from rest_framework.response import Response
 from rest_framework import status 
 import json
@@ -406,19 +406,22 @@ class DeliveryAdressView(APIView):
         serilizer = DeliverySerilizer(data=request.data)
         if serilizer.is_valid():
             serilizer.save()
-            return Response({'msg':'Data created Successfully'},status=status.HTTP_201_CREATED)
+            return Response({'msg':'Data created Successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
         else:
             return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
         
-    def get(self,request,format=None):
-        vendor = DeliveryAdress.objects.all()
-        serilizer = DeliverySerilizer(vendor,many=True)
-        return Response(serilizer.data)
-    
     def get(self,request,pk=None,format=None):
-        vendor = DeliveryAdress.objects.get(s_no=pk)
-        serilizer = DeliverySerilizer(vendor)
-        return Response(serilizer.data,status=status.HTTP_200_OK)
+        
+        if pk is not None:
+        
+            vendor = DeliveryAdress.objects.get(s_no=pk)
+            serilizer = DeliverySerilizer(vendor)
+            return Response(serilizer.data,status=status.HTTP_200_OK)
+        else :
+             vendor = DeliveryAdress.objects.all()
+             serilizer = DeliverySerilizerAll(vendor,many=True)
+             return Response(serilizer.data)
+        
     
     def put(self,request,pk=None,format=None):
         vendor = DeliveryAdress.objects.get(s_no=pk)
@@ -433,7 +436,7 @@ class DeliveryAdressView(APIView):
         serilizer = DeliverySerilizer(vendor,data=request.data)
         if serilizer.is_valid():
             serilizer.save()
-            return Response({'msg':'data change successfully'},status=status.HTTP_201_CREATED)
+            return Response({'msg':'data change successfully','data':serilizer.data},status=status.HTTP_201_CREATED)
         else:
             return Response(serilizer.errors,status=status.HTTP_400_BAD_REQUEST)
     

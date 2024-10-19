@@ -22,7 +22,7 @@ class AdminPurchaseRequestNew(admin.ModelAdmin):
 
 @admin.register(DeliveryAdress)
 class AdminDeliveryAdress(admin.ModelAdmin):
-    list_display=['s_no','name','phone_no','vendor_name','gst','email','address']
+    list_display=['s_no','name','phone_no','vendor_name','gst','email','address','company_address']
 
 @admin.register(PurchaseOrder)
 class AdminPurchaseOrder(admin.ModelAdmin):
